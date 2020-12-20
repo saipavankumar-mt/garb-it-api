@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\DataService\DataService.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,25 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GarbItAPIService", "GarbItAPIService\GarbItAPIService.csproj", "{C32B1468-DFC0-4EE8-B30E-ABE590F79EF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GarbItAPIService", "GarbItAPIService\GarbItAPIService.csproj", "{C32B1468-DFC0-4EE8-B30E-ABE590F79EF4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{07F09C6B-A6FA-4B2C-A1BF-36F7966FBE09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataService", "Services\DataService\DataService.csproj", "{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeService", "Services\EmployeeService\EmployeeService.csproj", "{C548A2AF-5BA2-4350-8A31-1EADDD174E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeService", "Services\EmployeeService\EmployeeService.csproj", "{C548A2AF-5BA2-4350-8A31-1EADDD174E4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminService", "Services\AdminService\AdminService.csproj", "{B6DFA7A1-8E9D-4FD6-9BAC-96DD55A6B561}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminService", "Services\AdminService\AdminService.csproj", "{B6DFA7A1-8E9D-4FD6-9BAC-96DD55A6B561}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdminService", "Services\SuperAdminService\SuperAdminService.csproj", "{434D9FB5-5D92-4CA8-B7DE-33FD8B7534AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperAdminService", "Services\SuperAdminService\SuperAdminService.csproj", "{434D9FB5-5D92-4CA8-B7DE-33FD8B7534AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{AC64D767-0304-4CA2-9B1F-DEF2CE56799D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSDynamoDBProvider", "Providers\AWSDynamoDBProvider\AWSDynamoDBProvider.csproj", "{754C48FC-7951-43F6-9379-21C4055D84A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSDynamoDBProvider", "Providers\AWSDynamoDBProvider\AWSDynamoDBProvider.csproj", "{754C48FC-7951-43F6-9379-21C4055D84A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{0E4ACBA3-963A-429D-A28F-D8041E3E258F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Core\Contracts\Contracts.csproj", "{339DC7E5-2609-4CC4-B771-E74B32FE531E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Core\Contracts\Contracts.csproj", "{339DC7E5-2609-4CC4-B771-E74B32FE531E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +31,6 @@ Global
 		{C32B1468-DFC0-4EE8-B30E-ABE590F79EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C32B1468-DFC0-4EE8-B30E-ABE590F79EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C32B1468-DFC0-4EE8-B30E-ABE590F79EF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C548A2AF-5BA2-4350-8A31-1EADDD174E4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C548A2AF-5BA2-4350-8A31-1EADDD174E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C548A2AF-5BA2-4350-8A31-1EADDD174E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,7 +56,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CB183C8C-D6B0-4007-A07F-3A39B11AD5D8} = {07F09C6B-A6FA-4B2C-A1BF-36F7966FBE09}
 		{C548A2AF-5BA2-4350-8A31-1EADDD174E4B} = {07F09C6B-A6FA-4B2C-A1BF-36F7966FBE09}
 		{B6DFA7A1-8E9D-4FD6-9BAC-96DD55A6B561} = {07F09C6B-A6FA-4B2C-A1BF-36F7966FBE09}
 		{434D9FB5-5D92-4CA8-B7DE-33FD8B7534AD} = {07F09C6B-A6FA-4B2C-A1BF-36F7966FBE09}

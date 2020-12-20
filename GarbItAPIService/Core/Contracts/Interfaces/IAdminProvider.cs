@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Contracts.Interfaces
 {
-    public interface IAdminService
+    public interface IAdminProvider
     {
-        Task<List<AdminInfo>> GetAdminInfos();
+        Task<List<AdminInfo>> GetAdmins();
 
         Task<bool> AddAdmin(AdminInfo adminInfo);
     }

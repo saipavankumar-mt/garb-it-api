@@ -11,10 +11,13 @@ namespace GarbItAPIService.Code
     {
         public static void Init(IServiceCollection services)
         {
-            services.AddSingleton<IDataService, DataService.DataService>();
-            services.AddSingleton<IAdminService, AdminService.AdminService>();
-            services.AddSingleton<ISuperAdminService, SuperAdminService.SuperAdminService>();
-            services.AddSingleton<IEmployeeService, EmployeeService.EmployeeService>();
+            services.AddTransient<IDataService, AWSDynamoDBProvider.Services.AWSDataService>();
+
+            services.AddTransient<IAdminService, AdminService.AdminService>();
+            services.AddTransient<IAdminProvider, AWSDynamoDBProvider.Providers.AdminProvider>();
+
+            services.AddTransient<ISuperAdminService, SuperAdminService.SuperAdminService>();
+            services.AddTransient<IEmployeeService, EmployeeService.EmployeeService>();            
         }
     }
 }

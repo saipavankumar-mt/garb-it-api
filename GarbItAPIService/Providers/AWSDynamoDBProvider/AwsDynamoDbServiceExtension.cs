@@ -10,8 +10,8 @@ namespace AWSDynamoDBProvider
     {
         public static void AwsDynamoDbServiceSetup(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddDefaultAWSOptions(configuration.GetAWSOptions());
-            //services.AddAWSService<IAmazonDynamoDB>();
+            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonDynamoDB>();
         }
 
 
