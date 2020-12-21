@@ -13,7 +13,6 @@
     <ProjectReference Include="..\Providers\AWSDynamoDBProvider\AWSDynamoDBProvider.csproj" />
     <ProjectReference Include="..\Services\AdminService\AdminService.csproj" />
     <ProjectReference Include="..\Services\EmployeeService\EmployeeService.csproj" />
-    <ProjectReference Include="..\Services\SuperAdminService\SuperAdminService.csproj" />
   </ItemGroup>
 
 

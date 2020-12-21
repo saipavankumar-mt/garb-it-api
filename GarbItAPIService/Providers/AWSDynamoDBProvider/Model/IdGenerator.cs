@@ -5,7 +5,6 @@ using System.Text;
 
 namespace AWSDynamoDBProvider.Model
 {
-    [DynamoDBTable("IdGenerator")]
     public class IdGenerator
     {
         [DynamoDBHashKey("Table")]

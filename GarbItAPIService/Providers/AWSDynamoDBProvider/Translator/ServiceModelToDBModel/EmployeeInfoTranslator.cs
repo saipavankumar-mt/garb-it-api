@@ -5,13 +5,13 @@ using System.Text;
 
 namespace AWSDynamoDBProvider
 {
-    public static class AdminInfoTranslator
+    public static class EmployeeInfoTranslator
     {
-        public static AdminInfo ToDBModel(this Contracts.Models.AdminInfo req, string nextId) 
+        public static EmployeeInfo ToDBModel(this Contracts.Models.EmployeeInfo req, string nextId)
         {
-            var dbModel = new AdminInfo()
+            var dbModel = new EmployeeInfo()
             {
-                AdminId = nextId,
+                EmployeeId = nextId,
                 Name = req.Name,
                 UserName = req.UserName,
                 Password = req.Password,

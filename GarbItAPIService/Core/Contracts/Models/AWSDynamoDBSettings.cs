@@ -6,5 +6,14 @@ namespace Contracts.Models
 {
     public class AWSDynamoDBSettings
     {
+        public TableNames TableNames { get; set; }
+    }
+
+    public class TableNames
+    {
+        public string SuperAdminTable { get; set; }
+        public string AdminTable { get; set; }
+        public string EmployeeTable { get; set; }
+        public string IdGeneratorTable { get; set; }
     }
 }

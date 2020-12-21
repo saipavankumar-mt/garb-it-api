@@ -1,14 +1,12 @@
-﻿using Amazon.DynamoDBv2.DataModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AWSDynamoDBProvider.Model
+namespace Contracts.Models
 {
-    public class AdminInfo
+    public class EmployeeInfo
     {
-        [DynamoDBHashKey("AdminId")]
-        public string AdminId { get; set; }
+        public string EmployeeId { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }

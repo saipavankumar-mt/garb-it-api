@@ -16,8 +16,10 @@ namespace GarbItAPIService.Code
             services.AddTransient<IAdminService, AdminService.AdminService>();
             services.AddTransient<IAdminProvider, AWSDynamoDBProvider.Providers.AdminProvider>();
 
-            services.AddTransient<ISuperAdminService, SuperAdminService.SuperAdminService>();
-            services.AddTransient<IEmployeeService, EmployeeService.EmployeeService>();            
+            services.AddTransient<IEmployeeService, EmployeeService.EmployeeService>();
+            services.AddTransient<IEmployeeProvider, AWSDynamoDBProvider.Providers.EmployeeProvider>();
+
+                        
         }
     }
 }

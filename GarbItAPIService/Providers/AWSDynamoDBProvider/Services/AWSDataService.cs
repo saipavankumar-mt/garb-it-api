@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using AWSDynamoDBProvider.Translator.DBModelToServiceModel;
+using Amazon.DynamoDBv2.DocumentModel;
+using Microsoft.Extensions.Options;
 
 namespace AWSDynamoDBProvider.Services
 {
@@ -16,11 +17,13 @@ namespace AWSDynamoDBProvider.Services
     {
         IAmazonDynamoDB _dynamoDbClient;
         DynamoDBOperationConfig _dynamoDbOperationConfig;
+        private AWSDynamoDBSettings _settings;
 
-        public AWSDataService(IAmazonDynamoDB dynamoDb)
+        public AWSDataService(IAmazonDynamoDB dynamoDb, IOptions<AWSDynamoDBSettings> options)
         {
             this._dynamoDbClient = dynamoDb;
-            _dynamoDbOperationConfig = new DynamoDBOperationConfig();            
+            _dynamoDbOperationConfig = new DynamoDBOperationConfig();
+            _settings = options.Value;
         }
 
         public async Task<bool> SaveData<T>(T req, string tableName)
@@ -48,14 +51,27 @@ namespace AWSDynamoDBProvider.Services
             {
                 _dynamoDbOperationConfig.OverrideTableName = tableName;
 
+                var result = new List<T>();
+
                 var request = new ScanRequest
                 {
                     TableName = tableName,
                 };
 
-                var docResponse = await this._dynamoDbClient.ScanAsync(request);
+                
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    var docResponse = await this._dynamoDbClient.ScanAsync(request);
 
-                return docResponse.ToEntityModel<T>();
+                    foreach (Dictionary<string, AttributeValue> item in docResponse.Items)
+                    {
+                        var doc = Document.FromAttributeMap(item);
+                        var typedDoc = dbContext.FromDocument<T>(doc);
+                        result.Add(typedDoc);
+                    }
+                }
+
+                return result;
             }
             catch(Exception ex)
             {
@@ -80,7 +96,7 @@ namespace AWSDynamoDBProvider.Services
             int nextId;
             using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
             {
-                _dynamoDbOperationConfig.OverrideTableName = "IdGenerator";
+                _dynamoDbOperationConfig.OverrideTableName = _settings.TableNames.IdGeneratorTable;
                 var doc = await dbContext.LoadAsync<DbModel.IdGenerator>(tableName, _dynamoDbOperationConfig);
 
                 if (doc == null)

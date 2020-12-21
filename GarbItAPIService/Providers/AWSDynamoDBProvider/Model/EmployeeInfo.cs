@@ -5,10 +5,10 @@ using System.Text;
 
 namespace AWSDynamoDBProvider.Model
 {
-    public class AdminInfo
+    public class EmployeeInfo
     {
-        [DynamoDBHashKey("AdminId")]
-        public string AdminId { get; set; }
+        [DynamoDBHashKey("EmployeeId")]
+        public string EmployeeId { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
