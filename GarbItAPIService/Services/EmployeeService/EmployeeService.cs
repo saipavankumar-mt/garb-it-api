@@ -19,9 +19,19 @@ namespace EmployeeService
             return await _employeeProvider.AddEmployee(employeeInfo);
         }
 
-        public async Task<List<EmployeeInfo>> GetEmployees()
+        public async Task<EmployeeInfo> GetEmployeeInfoAsync(string id)
         {
-            return await _employeeProvider.GetEmployees();
+            return await _employeeProvider.GetEmployeeInfoAsync(id);
+        }
+
+        public async Task<List<EmployeeInfo>> GetEmployees(string reportsToId)
+        {
+            return await _employeeProvider.GetEmployees(reportsToId);
+        }
+
+        public async Task<bool> RemoveEmployeeInfoByIdAsync(string id)
+        {
+            return await _employeeProvider.RemoveEmployeeInfoByIdAsync(id);
         }
     }
 }

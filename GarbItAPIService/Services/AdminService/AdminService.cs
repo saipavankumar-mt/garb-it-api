@@ -14,14 +14,24 @@ namespace AdminService
             _adminProvider = adminProvider;
         }
 
-        public Task<bool> AddAdmin(AdminInfo adminInfo)
+        public async Task<bool> AddAdmin(AdminInfo adminInfo)
         {
-            return _adminProvider.AddAdmin(adminInfo);
+            return await _adminProvider.AddAdmin(adminInfo);
         }
 
-        public Task<List<AdminInfo>> GetAdminInfos()
+        public async Task<AdminInfo> GetAdminInfoAsync(string id)
         {
-            return _adminProvider.GetAdmins();
+            return await _adminProvider.GetAdminInfoAsync(id);
+        }
+
+        public async Task<List<AdminInfo>> GetAdminInfos()
+        {
+            return await _adminProvider.GetAdmins();
+        }
+
+        public async Task<bool> RemoveAdminInfoByIdAsync(string id)
+        {
+            return await _adminProvider.RemoveAdminInfoByIdAsync(id);
         }
     }
 }

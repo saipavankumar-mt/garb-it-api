@@ -7,6 +7,11 @@ namespace AWSDynamoDBProvider.Model
 {
     public class EmployeeInfo
     {
+        public EmployeeInfo()
+        {
+
+        }
+
         [DynamoDBHashKey("EmployeeId")]
         public string EmployeeId { get; set; }
         public string UserName { get; set; }

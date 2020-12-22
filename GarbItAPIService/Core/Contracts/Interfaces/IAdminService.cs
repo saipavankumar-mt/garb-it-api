@@ -11,5 +11,8 @@ namespace Contracts.Interfaces
         Task<List<AdminInfo>> GetAdminInfos();
 
         Task<bool> AddAdmin(AdminInfo adminInfo);
+
+        Task<AdminInfo> GetAdminInfoAsync(string id);
+        Task<bool> RemoveAdminInfoByIdAsync(string id);
     }
 }

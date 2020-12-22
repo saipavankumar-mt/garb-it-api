@@ -26,10 +26,24 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAdminById(string id)
+        {
+            var result = await _adminService.GetAdminInfoAsync(id);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddAdmin([FromBody]AdminInfo adminInfo)
         {
             var result = await _adminService.AddAdmin(adminInfo);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoveAdmin(string id)
+        {
+            var result = await _adminService.RemoveAdminInfoByIdAsync(id);
             return Ok(result);
         }
     }

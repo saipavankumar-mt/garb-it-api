@@ -20,9 +20,16 @@ namespace GarbItAPIService.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees()
+        public async Task<IActionResult> GetEmployees([FromQuery] string reportsToId)
         {
-            var result = await _employeeService.GetEmployees();
+            var result = await _employeeService.GetEmployees(reportsToId);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEmployeeById(string id)
+        {
+            var result = await _employeeService.GetEmployeeInfoAsync (id);
             return Ok(result);
         }
 
@@ -30,6 +37,13 @@ namespace GarbItAPIService.Controllers
         public async Task<IActionResult> AddEmployee([FromBody] EmployeeInfo employeeInfo)
         {
             var result = await _employeeService.AddEmployee(employeeInfo);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoveEmployee(string id)
+        {
+            var result = await _employeeService.RemoveEmployeeInfoByIdAsync(id);
             return Ok(result);
         }
     }

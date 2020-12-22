@@ -58,7 +58,6 @@ namespace AWSDynamoDBProvider.Services
                     TableName = tableName,
                 };
 
-                
                 using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
                 {
                     var docResponse = await this._dynamoDbClient.ScanAsync(request);
@@ -80,14 +79,90 @@ namespace AWSDynamoDBProvider.Services
             
         }
 
+        public async Task<List<T>> GetData<T>(string tableName, string relationshipKey, string relationshipId)
+        {
+            try
+            {
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+
+                var result = new List<T>();
+
+                Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+                ScanFilter scanFilter = new ScanFilter();
+                scanFilter.AddCondition(relationshipKey, ScanOperator.Equal, relationshipId);
+
+                ScanOperationConfig config = new ScanOperationConfig()
+                {                   
+                    Filter = scanFilter
+                };
+
+                Search search = table.Scan(config);
+
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    do
+                    {
+                        var documentList = await search.GetNextSetAsync();
+
+                        foreach (var document in documentList)
+                        {
+                            var typedDoc = dbContext.FromDocument<T>(document);
+                            result.Add(typedDoc);
+                        }
+
+                    } while (!search.IsDone);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new List<T>();
+            }
+
+        }
+
         public Task<bool> UpdateData<T>(T adminInfo, string tableName)
         {
             throw new NotImplementedException();
         }
 
-        public Task<T> GetDataById<T>(string adminId, string tableName)
+        public async Task<T> GetDataById<T>(string userId, string tableName)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                var doc = await dbContext.LoadAsync<T>(userId, _dynamoDbOperationConfig);
+                return doc;
+            }
+        }
+
+        public async Task<T> GetDataByUserName<T>(string userName, string tableName)
+        {
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                var doc = await dbContext.LoadAsync<T>(userName, _dynamoDbOperationConfig);
+                return doc;
+            }
+        }
+
+        public async Task<bool> RemoveDataByIdAsync<T>(string id, string tableName)
+        {
+            try
+            {
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    _dynamoDbOperationConfig.OverrideTableName = tableName;
+                    await dbContext.DeleteAsync<T>(id, _dynamoDbOperationConfig);
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
 
@@ -117,5 +192,7 @@ namespace AWSDynamoDBProvider.Services
             }
             return nextId.ToString();
         }
+
+        
     }
 }

@@ -19,7 +19,12 @@ namespace GarbItAPIService.Code
             services.AddTransient<IEmployeeService, EmployeeService.EmployeeService>();
             services.AddTransient<IEmployeeProvider, AWSDynamoDBProvider.Providers.EmployeeProvider>();
 
-                        
+            services.AddTransient<IPasswordProvider, AWSDynamoDBProvider.Providers.PasswordProvider>();
+            
+            services.AddTransient<ISessionProvider, AWSDynamoDBProvider.Providers.SessionProvider>();
+            services.AddTransient<ISessionService, SessionService.SessionService>();
+
+
         }
     }
 }
