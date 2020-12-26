@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Contracts.Interfaces
 {
-    public interface ISessionProvider
+    public interface IClientProvider
     {
-        Task<string> CreateSessionAsync(LoginRequest loginRequest);
-        Task<SessionInfo> GetSessionInfoAsync(string sessionKey);
+        Task<bool> RegisterClientAsync(ClientInfo clientInfo);
+        Task<ClientInfo> GetClientInfoAsync(string qrCodeId);
     }
 }

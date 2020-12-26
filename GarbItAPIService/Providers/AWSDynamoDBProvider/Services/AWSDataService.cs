@@ -123,9 +123,22 @@ namespace AWSDynamoDBProvider.Services
 
         }
 
-        public Task<bool> UpdateData<T>(T adminInfo, string tableName)
+        public async Task<bool> UpdateData<T>(T req, string tableName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    _dynamoDbOperationConfig.OverrideTableName = tableName;
+                    await dbContext.SaveAsync<T>(req, _dynamoDbOperationConfig);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<T> GetDataById<T>(string userId, string tableName)

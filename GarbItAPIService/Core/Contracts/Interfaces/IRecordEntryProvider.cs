@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Contracts.Interfaces
 {
-    public interface ISessionProvider
+    public interface IRecordEntryProvider
     {
-        Task<string> CreateSessionAsync(LoginRequest loginRequest);
-        Task<SessionInfo> GetSessionInfoAsync(string sessionKey);
+        Task<bool> AddRecordEntryAsync(RecordEntryInfo recordInfo);
     }
 }

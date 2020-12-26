@@ -24,6 +24,9 @@ namespace GarbItAPIService.Code
             services.AddTransient<ISessionProvider, AWSDynamoDBProvider.Providers.SessionProvider>();
             services.AddTransient<ISessionService, SessionService.SessionService>();
 
+            services.AddTransient<IRecordEntryService, RecordEntryService.RecordEntryService>();
+            services.AddTransient<IRecordEntryProvider, AWSDynamoDBProvider.Providers.RecordEntryProvider>();
+
 
         }
     }

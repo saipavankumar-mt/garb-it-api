@@ -17,5 +17,7 @@ namespace Contracts.Models
         public string IdGeneratorTable { get; set; }
         public string PasswordRegistryTable { get; set; }
         public string SessionTable { get; set; }
+        public string ClientTable { get; set; }
+        public string RecordEntryTable { get; set; }
     }
 }

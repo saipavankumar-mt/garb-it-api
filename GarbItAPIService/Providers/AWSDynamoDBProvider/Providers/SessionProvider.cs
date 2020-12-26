@@ -21,43 +21,39 @@ namespace AWSDynamoDBProvider.Providers
             _settings = options.Value;
         }
 
+        public async Task<SessionInfo> GetSessionInfoAsync(string sessionKey)
+        {
+            var sessionInfo = await _dataService.GetDataById<Model.SessionInfo>(sessionKey, _settings.TableNames.SessionTable);
+
+            return sessionInfo.ToEntityModel();
+        }
+
         public async Task<string> CreateSessionAsync(LoginRequest loginRequest)
         {
-            if(await IsValidUser(loginRequest))
+            var user = await _passwordProvider.GetUserPassword(loginRequest.UserName);
+            if (user != null)
             {
-                var sessionKey = Guid.NewGuid().ToString();
-
-                var req = new SessionInfo()
+                if (loginRequest.Password.Equals(user.Password) && loginRequest.Role == user.Role)
                 {
-                    UserName = loginRequest.UserName,
-                    Role = loginRequest.Role
-                };
+                    var sessionKey = Guid.NewGuid().ToString();
 
-                var dbReq = req.ToDBModel(sessionKey);
+                    var req = new SessionInfo()
+                    {
+                        UserName = loginRequest.UserName,
+                        UserId = user.Id,
+                        Role = loginRequest.Role
+                    };
 
-                if(await _dataService.SaveData(dbReq, _settings.TableNames.SessionTable))
-                {
-                    return sessionKey;
+                    var dbReq = req.ToDBModel(sessionKey);
+
+                    if (await _dataService.SaveData(dbReq, _settings.TableNames.SessionTable))
+                    {
+                        return sessionKey;
+                    }
                 }
             }
 
             return string.Empty;
-
-
-        }
-
-        private async Task<bool> IsValidUser(LoginRequest loginRequest)
-        {
-            var user = await _passwordProvider.GetUserPassword(loginRequest.UserName);
-            if(user!=null)
-            {
-                if(loginRequest.Password.Equals(user.Password) && loginRequest.Role == user.Role)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

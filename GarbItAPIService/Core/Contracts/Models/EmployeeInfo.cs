@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Contracts.Models
 {
-    public class EmployeeInfo
+    public class EmployeeInfo : UserInfo
     {
         public string EmployeeId { get; set; }
         public string UserName { get; set; }

@@ -11,7 +11,7 @@ namespace GarbItAPIService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : BaseAPIController
     {
         private IEmployeeService _employeeService;
         public EmployeeController(IEmployeeService employeeService)

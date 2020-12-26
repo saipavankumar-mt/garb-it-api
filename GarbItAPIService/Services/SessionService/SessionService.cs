@@ -18,5 +18,10 @@ namespace SessionService
         {
             return await _sessionProvider.CreateSessionAsync(loginRequest);
         }
+
+        public async Task<SessionInfo> GetSessionInfoAsync(string sessionKey)
+        {
+            return await _sessionProvider.GetSessionInfoAsync(sessionKey);
+        }
     }
 }

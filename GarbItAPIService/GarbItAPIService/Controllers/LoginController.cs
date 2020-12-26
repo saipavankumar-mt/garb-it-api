@@ -11,7 +11,7 @@ namespace GarbItAPIService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class LoginController : BaseAPIController
     {
         private ISessionService _sessionService;
         

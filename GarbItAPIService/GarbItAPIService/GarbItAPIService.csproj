@@ -12,7 +12,9 @@
     <ProjectReference Include="..\Core\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Providers\AWSDynamoDBProvider\AWSDynamoDBProvider.csproj" />
     <ProjectReference Include="..\Services\AdminService\AdminService.csproj" />
+    <ProjectReference Include="..\Services\ClientService\ClientService.csproj" />
     <ProjectReference Include="..\Services\EmployeeService\EmployeeService.csproj" />
+    <ProjectReference Include="..\Services\RecordEntryService\RecordEntryService.csproj" />
     <ProjectReference Include="..\Services\SessionService\SessionService.csproj" />
   </ItemGroup>
 

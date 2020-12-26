@@ -58,6 +58,8 @@ namespace GarbItAPIService
 
             app.UseAuthorization();
 
+            app.RegisterMiddlewares();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
