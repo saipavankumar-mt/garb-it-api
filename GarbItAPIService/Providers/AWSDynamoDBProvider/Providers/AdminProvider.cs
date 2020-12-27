@@ -28,7 +28,7 @@ namespace AWSDynamoDBProvider.Providers
 
         }
 
-        public async Task<bool> AddAdmin(AdminInfo adminInfo)
+        public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
         {
             var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable);
 
@@ -39,11 +39,15 @@ namespace AWSDynamoDBProvider.Providers
                 var passwordEntry = GetPasswordEntry(req);
                 if(await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
-                    return true;
+                    return new AddUserResponse()
+                    {
+                        Id = nextId,
+                        Name = req.Name
+                    };
                 }
             }
 
-            return false;
+            return new AddUserResponse();
         }
 
         
@@ -53,7 +57,7 @@ namespace AWSDynamoDBProvider.Providers
             return await _dataService.GetDataById<AdminInfo>(id, _settings.TableNames.AdminTable);
         }
 
-        public async Task<bool> RemoveAdminInfoByIdAsync(string id)
+        public async Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id)
         {
             var admin = await GetAdminInfoAsync(id);
 
@@ -64,10 +68,14 @@ namespace AWSDynamoDBProvider.Providers
                     await _passwordProvider.RemoveUserFromPasswordRegistry(admin.UserName);
                 }
 
-                return true;
+                return new RemoveUserResponse()
+                {
+                    Id = admin.AdminId,
+                    Name = admin.Name
+                };
             }
 
-            return false;
+            return new RemoveUserResponse();
         }
 
         private static PasswordInfo GetPasswordEntry(Model.AdminInfo req)

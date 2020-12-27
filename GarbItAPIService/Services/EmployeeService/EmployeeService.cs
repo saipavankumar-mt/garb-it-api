@@ -14,7 +14,7 @@ namespace EmployeeService
             _employeeProvider = employeeProvider;
         }
 
-        public async Task<bool> AddEmployee(EmployeeInfo employeeInfo)
+        public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
         {
             return await _employeeProvider.AddEmployee(employeeInfo);
         }
@@ -29,7 +29,7 @@ namespace EmployeeService
             return await _employeeProvider.GetEmployees(reportsToId);
         }
 
-        public async Task<bool> RemoveEmployeeInfoByIdAsync(string id)
+        public async Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id)
         {
             return await _employeeProvider.RemoveEmployeeInfoByIdAsync(id);
         }

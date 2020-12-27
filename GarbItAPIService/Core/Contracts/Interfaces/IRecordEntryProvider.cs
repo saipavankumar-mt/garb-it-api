@@ -8,6 +8,6 @@ namespace Contracts.Interfaces
 {
     public interface IRecordEntryProvider
     {
-        Task<bool> AddRecordEntryAsync(RecordEntryInfo recordInfo);
+        Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo);
     }
 }

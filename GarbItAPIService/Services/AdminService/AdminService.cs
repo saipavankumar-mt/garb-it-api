@@ -14,7 +14,7 @@ namespace AdminService
             _adminProvider = adminProvider;
         }
 
-        public async Task<bool> AddAdmin(AdminInfo adminInfo)
+        public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
         {
             return await _adminProvider.AddAdmin(adminInfo);
         }
@@ -29,7 +29,7 @@ namespace AdminService
             return await _adminProvider.GetAdmins();
         }
 
-        public async Task<bool> RemoveAdminInfoByIdAsync(string id)
+        public async Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id)
         {
             return await _adminProvider.RemoveAdminInfoByIdAsync(id);
         }

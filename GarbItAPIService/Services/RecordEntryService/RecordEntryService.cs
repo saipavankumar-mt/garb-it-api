@@ -17,7 +17,7 @@ namespace RecordEntryService
             _clientProvider = clientProvider;
         }
 
-        public async Task<bool> AddRecordEntryAsync(string qrCodeId)
+        public async Task<AddRecordResponse> AddRecordEntryAsync(string qrCodeId)
         {
             //Get clientInfo from QR Code ID
 

@@ -28,117 +28,88 @@ namespace AWSDynamoDBProvider.Services
 
         public async Task<bool> SaveData<T>(T req, string tableName)
         {
-            try
-            {                
-                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
-                {
-                    _dynamoDbOperationConfig.OverrideTableName = tableName;
-                    await dbContext.SaveAsync<T>(req, _dynamoDbOperationConfig);
-                }
-
-                return true;
-            }
-            catch(Exception ex)
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
             {
-                return false;
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                await dbContext.SaveAsync<T>(req, _dynamoDbOperationConfig);
             }
-            
+
+            return true;
+
         }
 
         public async Task<List<T>> GetData<T>(string tableName)
         {
-            try
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+
+            var result = new List<T>();
+
+            var request = new ScanRequest
             {
-                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                TableName = tableName,
+            };
 
-                var result = new List<T>();
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                var docResponse = await this._dynamoDbClient.ScanAsync(request);
 
-                var request = new ScanRequest
+                foreach (Dictionary<string, AttributeValue> item in docResponse.Items)
                 {
-                    TableName = tableName,
-                };
-
-                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
-                {
-                    var docResponse = await this._dynamoDbClient.ScanAsync(request);
-
-                    foreach (Dictionary<string, AttributeValue> item in docResponse.Items)
-                    {
-                        var doc = Document.FromAttributeMap(item);
-                        var typedDoc = dbContext.FromDocument<T>(doc);
-                        result.Add(typedDoc);
-                    }
+                    var doc = Document.FromAttributeMap(item);
+                    var typedDoc = dbContext.FromDocument<T>(doc);
+                    result.Add(typedDoc);
                 }
+            }
 
-                return result;
-            }
-            catch(Exception ex)
-            {
-                return new List<T>();
-            }
-            
+            return result;
+
         }
 
         public async Task<List<T>> GetData<T>(string tableName, string relationshipKey, string relationshipId)
         {
-            try
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+
+            var result = new List<T>();
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+            ScanFilter scanFilter = new ScanFilter();
+            scanFilter.AddCondition(relationshipKey, ScanOperator.Equal, relationshipId);
+
+            ScanOperationConfig config = new ScanOperationConfig()
             {
-                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                Filter = scanFilter
+            };
 
-                var result = new List<T>();
+            Search search = table.Scan(config);
 
-                Table table = Table.LoadTable(this._dynamoDbClient, tableName);
-
-                ScanFilter scanFilter = new ScanFilter();
-                scanFilter.AddCondition(relationshipKey, ScanOperator.Equal, relationshipId);
-
-                ScanOperationConfig config = new ScanOperationConfig()
-                {                   
-                    Filter = scanFilter
-                };
-
-                Search search = table.Scan(config);
-
-                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                do
                 {
-                    do
+                    var documentList = await search.GetNextSetAsync();
+
+                    foreach (var document in documentList)
                     {
-                        var documentList = await search.GetNextSetAsync();
+                        var typedDoc = dbContext.FromDocument<T>(document);
+                        result.Add(typedDoc);
+                    }
 
-                        foreach (var document in documentList)
-                        {
-                            var typedDoc = dbContext.FromDocument<T>(document);
-                            result.Add(typedDoc);
-                        }
-
-                    } while (!search.IsDone);
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new List<T>();
+                } while (!search.IsDone);
             }
 
+            return result;
         }
 
         public async Task<bool> UpdateData<T>(T req, string tableName)
         {
-            try
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
             {
-                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
-                {
-                    _dynamoDbOperationConfig.OverrideTableName = tableName;
-                    await dbContext.SaveAsync<T>(req, _dynamoDbOperationConfig);
-                }
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                await dbContext.SaveAsync<T>(req, _dynamoDbOperationConfig);
+            }
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return true;
         }
 
         public async Task<T> GetDataById<T>(string userId, string tableName)
@@ -163,18 +134,11 @@ namespace AWSDynamoDBProvider.Services
 
         public async Task<bool> RemoveDataByIdAsync<T>(string id, string tableName)
         {
-            try
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
             {
-                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
-                {
-                    _dynamoDbOperationConfig.OverrideTableName = tableName;
-                    await dbContext.DeleteAsync<T>(id, _dynamoDbOperationConfig);
-                    return true;
-                }
-            }
-            catch(Exception ex)
-            {
-                return false;
+                _dynamoDbOperationConfig.OverrideTableName = tableName;
+                await dbContext.DeleteAsync<T>(id, _dynamoDbOperationConfig);
+                return true;
             }
         }
 
@@ -205,7 +169,5 @@ namespace AWSDynamoDBProvider.Services
             }
             return nextId.ToString();
         }
-
-        
     }
 }

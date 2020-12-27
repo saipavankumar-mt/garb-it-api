@@ -21,12 +21,20 @@ namespace AWSDynamoDBProvider.Providers
         }
 
 
-        public async Task<bool> AddRecordEntryAsync(RecordEntryInfo recordInfo)
+        public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
             var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable);
 
             var req = recordInfo.ToDBModel(nextId);
-            return await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable);
+            if(await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
+            {
+                return new AddRecordResponse()
+                {
+                    RecordId = req.RecordId
+                };
+            }
+
+            return new AddRecordResponse();
         }
     }
 }

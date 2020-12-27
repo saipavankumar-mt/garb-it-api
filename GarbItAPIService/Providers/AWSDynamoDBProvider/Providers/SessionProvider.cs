@@ -28,7 +28,7 @@ namespace AWSDynamoDBProvider.Providers
             return sessionInfo.ToEntityModel();
         }
 
-        public async Task<string> CreateSessionAsync(LoginRequest loginRequest)
+        public async Task<SessionResponse> CreateSessionAsync(LoginRequest loginRequest)
         {
             var user = await _passwordProvider.GetUserPassword(loginRequest.UserName);
             if (user != null)
@@ -48,12 +48,15 @@ namespace AWSDynamoDBProvider.Providers
 
                     if (await _dataService.SaveData(dbReq, _settings.TableNames.SessionTable))
                     {
-                        return sessionKey;
+                        return new SessionResponse()
+                        {
+                            SessionKey = sessionKey
+                        };
                     }
                 }
             }
 
-            return string.Empty;
+            return new SessionResponse();
         }
     }
 }

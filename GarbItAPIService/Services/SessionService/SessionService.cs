@@ -14,7 +14,7 @@ namespace SessionService
             _sessionProvider = sessionProvider;
         }
 
-        public async Task<string> CreateSessionAsync(LoginRequest loginRequest)
+        public async Task<SessionResponse> CreateSessionAsync(LoginRequest loginRequest)
         {
             return await _sessionProvider.CreateSessionAsync(loginRequest);
         }

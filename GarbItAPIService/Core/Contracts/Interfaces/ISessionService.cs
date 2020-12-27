@@ -8,7 +8,7 @@ namespace Contracts.Interfaces
 {
     public interface ISessionService
     {
-        Task<string> CreateSessionAsync(LoginRequest loginRequest);
+        Task<SessionResponse> CreateSessionAsync(LoginRequest loginRequest);
 
         Task<SessionInfo> GetSessionInfoAsync(string sessionKey);
     }

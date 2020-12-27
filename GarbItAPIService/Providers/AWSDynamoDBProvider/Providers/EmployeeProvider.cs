@@ -43,7 +43,7 @@ namespace AWSDynamoDBProvider.Providers
             return await _dataService.GetDataById<EmployeeInfo>(id, _settings.TableNames.EmployeeTable);
         }
 
-        public async Task<bool> AddEmployee(EmployeeInfo employeeInfo)
+        public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
         {
             var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable);
 
@@ -54,14 +54,17 @@ namespace AWSDynamoDBProvider.Providers
                 var passwordEntry = GetPasswordEntry(req);
                 if (await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
-                    return true;
+                    return new AddUserResponse() { 
+                        Id = req.EmployeeId,
+                        Name = req.Name
+                    };
                 }
             }
 
-            return false;
+            return new AddUserResponse();
         }
 
-        public async Task<bool> RemoveEmployeeInfoByIdAsync(string id)
+        public async Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id)
         {
             var employee = await GetEmployeeInfoAsync(id);
 
@@ -72,10 +75,14 @@ namespace AWSDynamoDBProvider.Providers
                     await _passwordProvider.RemoveUserFromPasswordRegistry(employee.UserName);
                 }
 
-                return true;
+                return new RemoveUserResponse()
+                {
+                    Id = employee.EmployeeId,
+                    Name = employee.Name
+                };
             }
 
-            return false;
+            return new RemoveUserResponse();
         }
 
 

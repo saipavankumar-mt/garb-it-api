@@ -24,7 +24,7 @@ namespace AWSDynamoDBProvider.Providers
             return await _dataService.GetDataById<ClientInfo>(qrCodeId, _settings.TableNames.ClientTable);
         }
 
-        public async Task<bool> RegisterClientAsync(ClientInfo clientInfo)
+        public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
             var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable);
 
@@ -34,10 +34,15 @@ namespace AWSDynamoDBProvider.Providers
 
             if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
             {
-                return true;
+                return new AddClientResponse()
+                {
+                    Id = clientInfo.ClientId,
+                    Name = clientInfo.Name,
+                    QRCodeId = clientInfo.QRCodeId
+                };
             }
 
-            return false;
+            return new AddClientResponse();
         }
     }
 }

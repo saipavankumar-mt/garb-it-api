@@ -19,7 +19,7 @@ namespace ClientService
             return await _clientProvider.GetClientInfoAsync(qrCodeId);
         }
 
-        public async Task<bool> RegisterClientAsync(ClientInfo clientInfo)
+        public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
             clientInfo.CreatedDate = DateTime.Now.ToString();
 
