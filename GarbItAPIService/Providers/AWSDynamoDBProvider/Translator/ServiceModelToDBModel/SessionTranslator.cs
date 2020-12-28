@@ -1,4 +1,5 @@
-﻿using AWSDynamoDBProvider.Model;
+﻿using Amazon.Util;
+using AWSDynamoDBProvider.Model;
 using Contracts.Models;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,16 @@ namespace AWSDynamoDBProvider
     {
         public static Model.SessionInfo ToDBModel(this Contracts.Models.SessionInfo req, string guid)
         {
+            DateTime expirationTime = DateTime.Now.AddMinutes(30);
+            var epochSeconds = AWSSDKUtils.ConvertToUnixEpochSeconds(expirationTime);
+
             var dbModel = new Model.SessionInfo()
             {
                 SessionId = guid,
                 UserName = req.UserName,
                 UserId = req.UserId,
                 Role = req.Role.ToString(),
-                ExpiryTime = DateTimeOffset.UtcNow.AddMinutes(3).ToUnixTimeMilliseconds()
+                ExpiryTime = epochSeconds
             };
 
             return dbModel;
