@@ -30,9 +30,21 @@ namespace GarbItAPIService
 
         public IConfiguration Configuration { get; }
 
+        private string _corsPolicyName = "All";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddCors(options =>
+               options.AddPolicy(_corsPolicyName,
+                   p => p   
+                   .AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+               ));
+
+
             services.AddControllers().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -45,8 +57,8 @@ namespace GarbItAPIService
 
             services.AddSwaggerDocument();
 
-            services.AddCors();
 
+            
             ContainerRegistry.Init(services);
         }
 
@@ -57,6 +69,8 @@ namespace GarbItAPIService
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(_corsPolicyName);
 
             app.UseRouting();
 
@@ -72,25 +86,7 @@ namespace GarbItAPIService
                 endpoints.MapControllers();
             });
 
-            app.UseCors(x => x
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .SetIsOriginAllowed(origin => true) // allow any origin
-                .AllowCredentials()); // allow credentials
-        }
 
-        private void AddCors(IServiceCollection services)
-        {
-            var allowOrigins = Configuration.GetSection("AllowedOrigins").Value.Split(',');
-            services.AddCors(options =>
-               options.AddPolicy("All",
-                   p => p
-                   .SetIsOriginAllowedToAllowWildcardSubdomains()
-                   .WithOrigins(allowOrigins)
-                   .AllowAnyMethod()
-                   .AllowCredentials()
-                   .AllowAnyHeader()
-               ));
         }
     }
 }
