@@ -16,6 +16,7 @@ namespace AWSDynamoDBProvider
                 UserName = req.UserName,
                 Password = req.Password,
                 PhoneNumber = req.PhoneNumber,
+                Role = req.Role.ToString(),
                 ReportsToId = req.ReportsToId,
                 ReportsToName = req.ReportsToName,
                 Designation = req.Designation,
