@@ -26,19 +26,33 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable, _settings.NextIdGeneratorValue.Client);
 
-            var scannerId = Guid.NewGuid().ToString();
-
-            var req = clientInfo.ToDBModel(nextId, scannerId);
+            var req = clientInfo.ToDBModel(nextId);
 
             if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
             {
                 return new AddClientResponse()
                 {
-                    Id = clientInfo.ClientId,
-                    Name = clientInfo.Name,
-                    QRCodeId = clientInfo.QRCodeId
+                    Id = req.Id,
+                    Name = req.Name,
+                    QRCodeId = req.QRCodeId
+                };
+            }
+
+            return new AddClientResponse();
+        }
+
+        public async Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo)
+        {
+            var req = updateInfo.ToDBModel();
+            if (await _dataService.UpdateData(req, _settings.TableNames.ClientTable))
+            {
+                return new AddClientResponse()
+                {
+                    Id = req.Id,
+                    Name = req.Name,
+                    QRCodeId = req.QRCodeId
                 };
             }
 

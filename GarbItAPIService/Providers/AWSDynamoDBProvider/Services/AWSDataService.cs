@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
 using Microsoft.Extensions.Options;
+using AWSDynamoDBProvider.Model;
 
 namespace AWSDynamoDBProvider.Services
 {
@@ -143,7 +144,7 @@ namespace AWSDynamoDBProvider.Services
         }
 
 
-        public async Task<string> GetNextId(string tableName)
+        public async Task<string> GetNextId(string tableName, int initialNextId)
         {
             int nextId;
             using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
@@ -156,9 +157,9 @@ namespace AWSDynamoDBProvider.Services
                     await dbContext.SaveAsync(new DbModel.IdGenerator()
                     {
                         Table = tableName,
-                        NextId = 1
+                        NextId = initialNextId
                     }, _dynamoDbOperationConfig);
-                    nextId = 1;
+                    nextId = initialNextId;
                 }
                 else
                 {

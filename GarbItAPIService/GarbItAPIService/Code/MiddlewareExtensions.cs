@@ -10,8 +10,8 @@ namespace GarbItAPIService.Code
     {
         public static IApplicationBuilder RegisterMiddlewares(this IApplicationBuilder app)
         {
-            app.UseMiddleware<AmbientContextMiddleware>();
             app.UseMiddleware<ExceptionHandler>();
+            app.UseMiddleware<AmbientContextMiddleware>();            
             return app;
         }
     }

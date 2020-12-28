@@ -20,6 +20,11 @@ namespace GarbItAPIService.Controllers
             _sessionService = sessionService;
         }
 
+        /// <summary>
+        /// Login API for Super Admin, Admin and Employee
+        /// </summary>
+        /// <param name="loginRequest"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> CreateSessionAsync([FromBody] LoginRequest loginRequest)
         {

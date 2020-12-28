@@ -14,7 +14,7 @@ namespace Contracts.Interfaces
         Task<bool> SaveData<T>(T req, string tableName);
         Task<T> GetDataById<T>(string id, string tableName);
         Task<T> GetDataByUserName<T>(string userName, string tableName);
-        Task<string> GetNextId(string tableName);
+        Task<string> GetNextId(string tableName, int initialNextId);
         Task<bool> RemoveDataByIdAsync<T>(string id, string tableName);
     }
 }

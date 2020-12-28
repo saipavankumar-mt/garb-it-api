@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Contracts.Models
 {
-    public class AppSettings
+    public class SuperAdminInfo : UserInfo
     {
-        public string AccessKey { get; set; }
+        
     }
 }

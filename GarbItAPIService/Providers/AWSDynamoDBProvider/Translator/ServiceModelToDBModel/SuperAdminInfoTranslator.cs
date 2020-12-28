@@ -5,19 +5,18 @@ using System.Text;
 
 namespace AWSDynamoDBProvider
 {
-    public static class EmployeeInfoTranslator
+    public static class SuperAdminInfoTranslator
     {
-        public static EmployeeInfo ToDBModel(this Contracts.Models.EmployeeInfo req, string nextId ="")
+        public static SuperAdminInfo ToDBModel(this Contracts.Models.SuperAdminInfo req, string nextId="")
         {
-            var dbModel = new EmployeeInfo()
+            var dbModel = new SuperAdminInfo()
             {
-                Id = string.IsNullOrEmpty(req.Id)? nextId : req.Id,
+                Id = string.IsNullOrEmpty(req.Id) ? nextId : req.Id,
                 Name = req.Name,
                 UserName = req.UserName,
                 Password = req.Password,
                 PhoneNumber = req.PhoneNumber,
-                ReportsToId = req.ReportsToId,
-                ReportsToName = req.ReportsToName,
+                Role = req.Role.ToString(),
                 Designation = req.Designation,
                 Department = req.Department,
                 Location = req.Location,
@@ -27,10 +26,7 @@ namespace AWSDynamoDBProvider
                 Country = req.Country,
                 CreatedById = req.CreatedById,
                 CreatedByName = req.CreatedByName,
-                CreatedDateTime = req.CreatedDateTime,
-                UpdatedById = req.UpdatedById,
-                UpdatedByName = req.UpdatedByName,
-                UpdatedDateTime = req.UpdatedDateTime
+                CreatedDateTime = DateTime.Now.ToString()                
             };
 
             return dbModel;

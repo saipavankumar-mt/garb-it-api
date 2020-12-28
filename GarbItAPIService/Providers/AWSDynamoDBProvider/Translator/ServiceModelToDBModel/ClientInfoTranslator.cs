@@ -7,26 +7,26 @@ namespace AWSDynamoDBProvider
 {
     public static class ClientInfoTranslator
     {
-        public static ClientInfo ToDBModel(this Contracts.Models.ClientInfo req, string nextId, string qrCodeId)
+        public static ClientInfo ToDBModel(this Contracts.Models.ClientInfo req, string nextId = "")
         {
             var dbModel = new ClientInfo()
             {
-                ClientId = nextId,
+                Id = string.IsNullOrEmpty(req.Id) ? nextId : req.Id,
                 Name = req.Name,
                 PhoneNumber = req.PhoneNumber,
                 Address = req.Address,
                 Location = req.Location,
-                Muncipality = req.Muncipality,
+                Municipality = req.Municipality,
                 City = req.City,
                 State = req.State,
                 Country = req.Country,
-                QRCodeId = qrCodeId,
+                QRCodeId = string.IsNullOrEmpty(req.QRCodeId) ?  Guid.NewGuid().ToString() : req.QRCodeId,
                 CreatedById = req.CreatedById,
                 CreatedByName = req.CreatedByName,
                 UpdatedById = req.UpdatedById,
                 UpdatedByName = req.UpdatedByName,
-                CreatedDate = req.CreatedDate,
-                UpdatedDate = req.UpdatedDate
+                CreatedDateTime = req.CreatedDateTime,
+                UpdatedDateTime = req.UpdatedDateTime
             };
 
             return dbModel;

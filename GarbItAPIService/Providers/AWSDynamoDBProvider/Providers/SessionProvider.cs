@@ -41,7 +41,7 @@ namespace AWSDynamoDBProvider.Providers
                     {
                         UserName = loginRequest.UserName,
                         UserId = user.Id,
-                        Role = loginRequest.Role
+                        Role = loginRequest.Role,
                     };
 
                     var dbReq = req.ToDBModel(sessionKey);
@@ -50,7 +50,10 @@ namespace AWSDynamoDBProvider.Providers
                     {
                         return new SessionResponse()
                         {
-                            SessionKey = sessionKey
+                            SessionKey = sessionKey,
+                            Id = user.Id,
+                            Name = user.Name,
+                            Role = user.Role
                         };
                     }
                 }

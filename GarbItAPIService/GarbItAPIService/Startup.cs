@@ -1,4 +1,6 @@
+using Autofac;
 using AWSDynamoDBProvider;
+using Contracts;
 using Contracts.Models;
 using GarbItAPIService.Code;
 using Microsoft.AspNetCore.Builder;
@@ -41,6 +43,10 @@ namespace GarbItAPIService
             // Aws DynamoDb service setup
             services.AwsDynamoDbServiceSetup(Configuration);
 
+            services.AddSwaggerDocument();
+
+            services.AddCors();
+
             ContainerRegistry.Init(services);
         }
 
@@ -52,18 +58,25 @@ namespace GarbItAPIService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.RegisterMiddlewares();
 
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
         }
 
         private void AddCors(IServiceCollection services)

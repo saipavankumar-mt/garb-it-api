@@ -7,6 +7,7 @@ namespace Contracts.Models
     public class AWSDynamoDBSettings
     {
         public TableNames TableNames { get; set; }
+        public NextIdGeneratorValue NextIdGeneratorValue { get; set; }
     }
 
     public class TableNames
@@ -19,5 +20,15 @@ namespace Contracts.Models
         public string SessionTable { get; set; }
         public string ClientTable { get; set; }
         public string RecordEntryTable { get; set; }
+    }
+
+    public class NextIdGeneratorValue
+    {
+        public int SuperAdmin { get; set; }
+        public int Admin { get; set; }
+        public int Employee { get; set; }
+        public int Client { get; set; }
+        public int Record { get; set; }
+
     }
 }

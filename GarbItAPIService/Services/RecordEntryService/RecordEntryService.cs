@@ -27,7 +27,7 @@ namespace RecordEntryService
 
             var recordInfo = new RecordEntryInfo()
             {
-                ClientId = clientInfo.ClientId,
+                ClientId = clientInfo.Id,
                 ClientName = clientInfo.Name,
                 EmployeeId = AmbientContext.Current.UserId,
                 EmployeeName = AmbientContext.Current.UserName,

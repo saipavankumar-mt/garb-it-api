@@ -10,9 +10,10 @@ namespace Contracts.Interfaces
     {
         Task<List<AdminInfo>> GetAdminInfos();
 
-        Task<AddUserResponse> AddAdmin(AdminInfo adminInfo);
+        Task<AddUserResponse> AddAdmin(AdminAddRequest req);
 
         Task<AdminInfo> GetAdminInfoAsync(string id);
         Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id);
+        Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo);
     }
 }

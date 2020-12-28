@@ -7,11 +7,11 @@ namespace AWSDynamoDBProvider
 {
     public static class AdminInfoTranslator
     {
-        public static AdminInfo ToDBModel(this Contracts.Models.AdminInfo req, string nextId) 
+        public static AdminInfo ToDBModel(this Contracts.Models.AdminInfo req, string nextId = "") 
         {
             var dbModel = new AdminInfo()
             {
-                AdminId = nextId,
+                Id = string.IsNullOrEmpty(req.Id) ? nextId : req.Id,
                 Name = req.Name,
                 UserName = req.UserName,
                 Password = req.Password,
@@ -21,9 +21,16 @@ namespace AWSDynamoDBProvider
                 Designation = req.Designation,
                 Department = req.Department,
                 Location = req.Location,
-                Muncipality = req.Muncipality,
+                Municipality = req.Municipality,
                 City = req.City,
-                State = req.State
+                State = req.State,
+                Country = req.Country,
+                CreatedById = req.CreatedById,
+                CreatedByName = req.CreatedByName,
+                CreatedDateTime = req.CreatedDateTime,
+                UpdatedById = req.UpdatedById,
+                UpdatedByName = req.UpdatedByName,
+                UpdatedDateTime = req.UpdatedDateTime
             };
 
             return dbModel;

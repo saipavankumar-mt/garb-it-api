@@ -8,9 +8,11 @@ namespace Contracts.Interfaces
 {
     public interface IEmployeeService
     {
-        Task<List<EmployeeInfo>> GetEmployees(string reportsToId);
+        Task<List<EmployeeInfo>> GetEmployees();
+        Task<List<EmployeeInfo>> GetAllEmployees();
         Task<EmployeeInfo> GetEmployeeInfoAsync(string id);
-        Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo);
-        Task<AddUserResponse> RemoveEmployeeInfoByIdAsync(string id);
+        Task<AddUserResponse> AddEmployee(EmployeeAddRequest employeeAddRequest);
+        Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id);
+        Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo);
     }
 }

@@ -20,20 +20,44 @@ namespace GarbItAPIService.Controllers
             _clientService = clientService;
         }
 
+        /// <summary>
+        /// Can be accessed by Admin to Create a client in his location
+        /// </summary>
+        /// <param name="clientAddRequest"></param>
+        /// <param name="sessionKey"></param>
+        /// <returns></returns>
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterClientAsync([FromBody] ClientInfo clientInfo)
+        public async Task<IActionResult> RegisterClientAsync([FromBody] ClientAddRequest clientAddRequest, [FromHeader(Name = "session-key")] string sessionKey)
         {
-            var result = await _clientService.RegisterClientAsync(clientInfo);
+            var result = await _clientService.RegisterClientAsync(clientAddRequest);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Accessed by Employee to scan QRCode
+        /// </summary>
+        /// <param name="qrCodeId"></param>
+        /// <param name="sessionKey"></param>
+        /// <returns></returns>
         [HttpGet("{qrCodeId}")]
-        public async Task<IActionResult> GetClientInfoAsync(string qrCodeId)
+        public async Task<IActionResult> GetClientInfoAsync(string qrCodeId, [FromHeader(Name = "session-key")] string sessionKey)
         {
             var result = await _clientService.GetClientInfoAsync(qrCodeId);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Accessed by Admin to Update Client info
+        /// </summary>
+        /// <param name="clientInfo"></param>
+        /// <param name="sessionKey"></param>
+        /// <returns></returns>
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateClientAsync([FromBody] ClientInfo clientInfo, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _clientService.UpdateClientAsync(clientInfo);
+            return Ok(result);
+        }
 
     }
 }

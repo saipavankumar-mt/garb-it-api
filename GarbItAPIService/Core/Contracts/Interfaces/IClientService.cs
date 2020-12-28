@@ -8,7 +8,8 @@ namespace Contracts.Interfaces
 {
     public interface IClientService
     {
-        Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo);
+        Task<AddClientResponse> RegisterClientAsync(ClientAddRequest clientInfo);
         Task<ClientInfo> GetClientInfoAsync(string qrCodeId);
+        Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo);
     }
 }

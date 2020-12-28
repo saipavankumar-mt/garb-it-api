@@ -23,7 +23,7 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable, _settings.NextIdGeneratorValue.Record);
 
             var req = recordInfo.ToDBModel(nextId);
             if(await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))

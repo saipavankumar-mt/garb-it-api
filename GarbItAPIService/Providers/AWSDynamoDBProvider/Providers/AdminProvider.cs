@@ -21,16 +21,25 @@ namespace AWSDynamoDBProvider.Providers
             _settings = options.Value;
         }
 
-        public async Task<List<AdminInfo>> GetAdmins()
+        public async Task<List<AdminInfo>> GetAdmins(string reportsToId = "")
         {
-            var response = await _dataService.GetData<AdminInfo>(_settings.TableNames.AdminTable);
-            return response;
+            var response = new List<AdminInfo>();
 
+            if (string.IsNullOrEmpty(reportsToId))
+            {
+                response = await _dataService.GetData<AdminInfo>(_settings.TableNames.AdminTable);
+            }
+            else
+            {
+                response = await _dataService.GetData<AdminInfo>(_settings.TableNames.AdminTable, "ReportsToId", reportsToId);
+            }
+
+            return response;
         }
 
         public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable, _settings.NextIdGeneratorValue.Admin);
 
             var req = adminInfo.ToDBModel(nextId);
 
@@ -50,7 +59,21 @@ namespace AWSDynamoDBProvider.Providers
             return new AddUserResponse();
         }
 
-        
+        public async Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo)
+        {
+            var req = adminInfo.ToDBModel();
+
+            if (await _dataService.UpdateData(req, _settings.TableNames.AdminTable))
+            {
+                return new AddUserResponse()
+                {
+                    Id = req.Id,
+                    Name = req.Name
+                };
+            }
+
+            return new AddUserResponse();
+        }
 
         public async Task<AdminInfo> GetAdminInfoAsync(string id)
         {
@@ -70,7 +93,7 @@ namespace AWSDynamoDBProvider.Providers
 
                 return new RemoveUserResponse()
                 {
-                    Id = admin.AdminId,
+                    Id = admin.Id,
                     Name = admin.Name
                 };
             }
@@ -82,10 +105,11 @@ namespace AWSDynamoDBProvider.Providers
         {
             return new PasswordInfo()
             {
-                Id = req.AdminId,
+                Id = req.Id,
                 UserName = req.UserName,
                 Password = req.Password,
-                Role = Role.Admin
+                Role = Role.Admin,
+                Name = req.Name
             };
         }
 

@@ -19,8 +19,8 @@ namespace GarbItAPIService.Controllers
             _recordEntryService = recordEntryService;
         }
 
-        [HttpPost("Scan/{qrCodeId}")]
-        public async Task<IActionResult> AddScannedRecordAsync(string qrCodeId)
+        [HttpGet("Scan/{qrCodeId}")]
+        public async Task<IActionResult> AddScannedRecordAsync(string qrCodeId, [FromHeader(Name = "session-key")] string sessionKey)
         {
             var result = await _recordEntryService.AddRecordEntryAsync(qrCodeId);
             return Ok(result);

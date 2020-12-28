@@ -45,7 +45,7 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable, _settings.NextIdGeneratorValue.Employee);
 
             var req = employeeInfo.ToDBModel(nextId);
 
@@ -55,10 +55,26 @@ namespace AWSDynamoDBProvider.Providers
                 if (await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
                     return new AddUserResponse() { 
-                        Id = req.EmployeeId,
+                        Id = req.Id,
                         Name = req.Name
                     };
                 }
+            }
+
+            return new AddUserResponse();
+        }
+
+        public async Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo)
+        {
+            var req = employeeInfo.ToDBModel();
+
+            if (await _dataService.UpdateData(req, _settings.TableNames.EmployeeTable))
+            {
+                return new AddUserResponse()
+                {
+                    Id = req.Id,
+                    Name = req.Name
+                };
             }
 
             return new AddUserResponse();
@@ -77,7 +93,7 @@ namespace AWSDynamoDBProvider.Providers
 
                 return new RemoveUserResponse()
                 {
-                    Id = employee.EmployeeId,
+                    Id = employee.Id,
                     Name = employee.Name
                 };
             }
@@ -90,10 +106,11 @@ namespace AWSDynamoDBProvider.Providers
         {
             return new PasswordInfo()
             {
-                Id = req.EmployeeId,
+                Id = req.Id,
                 UserName = req.UserName,
                 Password = req.Password,
-                Role = Role.Employee
+                Role = Role.Employee,
+                Name = req.Name
             };
         }
     }

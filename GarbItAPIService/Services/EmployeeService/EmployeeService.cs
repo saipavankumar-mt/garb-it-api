@@ -1,4 +1,5 @@
-﻿using Contracts.Interfaces;
+﻿using Contracts;
+using Contracts.Interfaces;
 using Contracts.Models;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,9 @@ namespace EmployeeService
             _employeeProvider = employeeProvider;
         }
 
-        public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
+        public async Task<AddUserResponse> AddEmployee(EmployeeAddRequest employeeAddRequest)
         {
+            var employeeInfo = employeeAddRequest.ToCoreModel();
             return await _employeeProvider.AddEmployee(employeeInfo);
         }
 
@@ -24,14 +26,29 @@ namespace EmployeeService
             return await _employeeProvider.GetEmployeeInfoAsync(id);
         }
 
-        public async Task<List<EmployeeInfo>> GetEmployees(string reportsToId)
+        public async Task<List<EmployeeInfo>> GetEmployees()
         {
-            return await _employeeProvider.GetEmployees(reportsToId);
+            var adminId = AmbientContext.Current.UserId;
+            return await _employeeProvider.GetEmployees(adminId);
+        }
+
+        public async Task<List<EmployeeInfo>> GetAllEmployees()
+        {
+            return await _employeeProvider.GetEmployees();
         }
 
         public async Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id)
         {
             return await _employeeProvider.RemoveEmployeeInfoByIdAsync(id);
+        }
+
+        public async Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo)
+        {
+            employeeInfo.UpdatedById = AmbientContext.Current.UserId;
+            employeeInfo.UpdatedByName = AmbientContext.Current.UserName;
+            employeeInfo.UpdatedDateTime = DateTime.Now.ToString();
+
+            return await _employeeProvider.UpdateEmployeeAsync(employeeInfo);
         }
     }
 }

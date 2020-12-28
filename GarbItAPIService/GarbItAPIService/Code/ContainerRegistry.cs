@@ -11,7 +11,13 @@ namespace GarbItAPIService.Code
     {
         public static void Init(IServiceCollection services)
         {
+            services.AddTransient<AmbientContextMiddleware, AmbientContextMiddleware>();
+            services.AddTransient<ExceptionHandler, ExceptionHandler>();
+
             services.AddTransient<IDataService, AWSDynamoDBProvider.Services.AWSDataService>();
+
+            services.AddTransient<ISuperAdminService, SuperAdminService.SuperAdminService>();
+            services.AddTransient<ISuperAdminProvider, AWSDynamoDBProvider.Providers.SuperAdminProvider>();
 
             services.AddTransient<IAdminService, AdminService.AdminService>();
             services.AddTransient<IAdminProvider, AWSDynamoDBProvider.Providers.AdminProvider>();
@@ -26,6 +32,9 @@ namespace GarbItAPIService.Code
 
             services.AddTransient<IRecordEntryService, RecordEntryService.RecordEntryService>();
             services.AddTransient<IRecordEntryProvider, AWSDynamoDBProvider.Providers.RecordEntryProvider>();
+
+            services.AddTransient<IClientService, ClientService.ClientService>();
+            services.AddTransient<IClientProvider, AWSDynamoDBProvider.Providers.ClientProvider>();
 
 
         }

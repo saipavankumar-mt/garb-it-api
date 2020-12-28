@@ -1,0 +1,16 @@
+﻿using Contracts.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Contracts.Interfaces
+{
+    public interface ISuperAdminProvider
+    {
+        Task<SuperAdminInfo> GetSuperAdminInfoAsync(string id);
+
+        Task<AddUserResponse> AddSuperAdmin(SuperAdminInfo superAdminInfo);
+
+    }
+}

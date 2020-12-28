@@ -10,5 +10,6 @@ namespace Contracts.Interfaces
     {
         Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo);
         Task<ClientInfo> GetClientInfoAsync(string qrCodeId);
+        Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo);
     }
 }

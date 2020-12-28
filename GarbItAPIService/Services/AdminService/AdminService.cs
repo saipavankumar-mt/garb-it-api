@@ -1,4 +1,5 @@
-﻿using Contracts.Interfaces;
+﻿using Contracts;
+using Contracts.Interfaces;
 using Contracts.Models;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,20 @@ namespace AdminService
             _adminProvider = adminProvider;
         }
 
-        public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
+        public async Task<AddUserResponse> AddAdmin(AdminAddRequest req)
         {
+            var adminInfo = req.ToCoreModel();
             return await _adminProvider.AddAdmin(adminInfo);
+        }
+
+
+        public async Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo)
+        {
+            adminInfo.UpdatedById = AmbientContext.Current.UserId;
+            adminInfo.UpdatedByName = AmbientContext.Current.UserName;
+            adminInfo.UpdatedDateTime = DateTime.Now.ToString();
+
+            return await _adminProvider.UpdateAdminAsync(adminInfo);
         }
 
         public async Task<AdminInfo> GetAdminInfoAsync(string id)
@@ -26,12 +38,14 @@ namespace AdminService
 
         public async Task<List<AdminInfo>> GetAdminInfos()
         {
-            return await _adminProvider.GetAdmins();
+            var superAdminId = AmbientContext.Current.UserId;
+            return await _adminProvider.GetAdmins(superAdminId);
         }
 
         public async Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id)
         {
             return await _adminProvider.RemoveAdminInfoByIdAsync(id);
         }
+
     }
 }

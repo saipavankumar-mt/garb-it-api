@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Contracts.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Contracts
         public string ApiSessionId { get; set; }
         public string UserId { get; set; }
         public string UserName { get; set; }
+        public Role Role { get; set; }
 
 
         public AmbientContext(AmbientContext ambientContext)

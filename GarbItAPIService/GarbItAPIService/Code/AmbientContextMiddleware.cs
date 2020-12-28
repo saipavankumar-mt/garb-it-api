@@ -1,6 +1,8 @@
 ﻿using Contracts;
 using Contracts.Interfaces;
+using Contracts.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +15,36 @@ namespace GarbItAPIService.Code
         private ISessionService _sessionService;
         private IAdminService _adminService;
         private IEmployeeService _employeeService;
+        private AppSettings _settings;
 
-        public AmbientContextMiddleware(ISessionService sessionService, IAdminService adminService, IEmployeeService employeeService)
+        public AmbientContextMiddleware(ISessionService sessionService, IAdminService adminService, IEmployeeService employeeService, IOptions<AppSettings> options)
         {
             _sessionService = sessionService;
             _adminService = adminService;
             _employeeService = employeeService;
+            _settings = options.Value;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {            
             var apiSessionId = string.Empty;
 
-            if(context.Request.Path.Value.Contains("login"))
+            if(context.Request.Path.Value.ToLower().Contains("login") || context.Request.Path.Value.ToLower().Contains("swagger"))
             {
                 await next(context);
+            }
+
+            else if(context?.Request.Headers.ContainsKey("access-key") == true)
+            {
+                var accessKey = context.Request.Headers["access-key"];
+                if(accessKey.Equals(_settings.AccessKey))
+                {
+                    await next(context);
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException();
+                }
             }
 
             else if (context?.Request.Headers.ContainsKey("session-key") == true)
@@ -40,24 +57,10 @@ namespace GarbItAPIService.Code
 
                     if (userProfile != null)
                     {
-                        switch (userProfile.Role)
-                        {
-                            case Contracts.Models.Role.Admin:
-                                {
-                                    var adminInfo = await _adminService.GetAdminInfoAsync(userProfile.UserId);
-                                    ambientContext.UserId = adminInfo.AdminId;
-                                    ambientContext.UserName = adminInfo.UserName;
-                                }
-                                break;
-                            case Contracts.Models.Role.Employee:
-                                {
-                                    var employeeInfo = await _employeeService.GetEmployeeInfoAsync(userProfile.UserId);
-                                    ambientContext.UserId = employeeInfo.EmployeeId;
-                                    ambientContext.UserName = employeeInfo.UserName;
-                                }
-                                break;
-                        }
-
+                        ambientContext.Role = userProfile.Role;
+                        ambientContext.UserId = userProfile.UserId;
+                        ambientContext.UserName = userProfile.UserName;
+                        
                         await next(context);
                     }
                     else
