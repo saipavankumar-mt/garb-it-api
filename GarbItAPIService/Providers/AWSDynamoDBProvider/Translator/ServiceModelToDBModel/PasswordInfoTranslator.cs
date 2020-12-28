@@ -15,6 +15,7 @@ namespace AWSDynamoDBProvider
                 Id = passwordInfo.Id,
                 UserName = passwordInfo.UserName,
                 Password = passwordInfo.Password,
+                Name = passwordInfo.Name,
                 Role = passwordInfo.Role.ToString()
             };
 
@@ -28,6 +29,7 @@ namespace AWSDynamoDBProvider
                 Id = passwordregistry.Id,
                 UserName = passwordregistry.UserName,
                 Password = passwordregistry.Password,
+                Name = passwordregistry.Name,
                 Role =  Enum.Parse<Role>(passwordregistry.Role)
             };
 
