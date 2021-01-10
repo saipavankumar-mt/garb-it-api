@@ -11,6 +11,5 @@ namespace Contracts.Interfaces
         Task<List<SecretQuestion>> GetSecretQuestionsAsync();
         Task<AddSecretQuestionResponse> AddSecretQuestionAsync(SecretQuestionAddRequest req);
         Task<SecretQuestion> GetSecretQuestionByIdAsync(string id);
-        Task<SuccessResponse> ForgotPasswordChangeRequestAsync(ForgotPasswordChangeRequest req);
     }
 }
