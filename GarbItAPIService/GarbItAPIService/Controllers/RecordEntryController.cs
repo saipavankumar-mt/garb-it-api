@@ -41,6 +41,13 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+        [HttpPost("daycount")]
+        public async Task<IActionResult> GetScannedRecordsDayCountAsync([FromQuery] string fromDate, [FromQuery] string toDate, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _recordEntryService.GetScannedRecordsDayCountAsync(fromDate, toDate);
+            return Ok(result);
+        }
+
         [HttpGet("activeclients")]
         public async Task<IActionResult> GetActiveClientsCountAsync([FromHeader(Name = "session-key")] string sessionKey)
         {

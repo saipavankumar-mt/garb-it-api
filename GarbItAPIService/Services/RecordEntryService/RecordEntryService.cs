@@ -87,6 +87,29 @@ namespace RecordEntryService
             };
         }
 
+        public async Task<List<RecordScannedDayCountResponse>> GetScannedRecordsDayCountAsync(string fromDate, string toDate)
+        {
+            var role = AmbientContext.Current.UserInfo.Role;
+            var searchRequests = new List<SearchRequest>();
+            if (role.Equals(Role.SuperAdmin))
+            {
+                searchRequests.Add(new SearchRequest() { SearchByKey = "Location", SearchByValue = AmbientContext.Current.UserInfo.Location });
+            }
+
+            if (role.Equals(Role.Admin))
+            {
+                searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
+            }
+
+            var recordsCollected = await _recordEntryProvider.GetCollectedRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+
+            var response = new List<RecordScannedDayCountResponse>();
+
+            var groupedResponse = recordsCollected.GroupBy(x=> TruncateTime(x.ScannedDateTime)).Select(x => new RecordScannedDayCountResponse() { Date = x.Key, Count = x.Count() });
+
+            return groupedResponse.ToList();
+        }
+
         public async Task<List<RecordEntryInfo>> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate)
         {
             if(searchRequests == null)
@@ -106,6 +129,12 @@ namespace RecordEntryService
             }
 
             return await _recordEntryProvider.GetCollectedRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+        }
+
+
+        private string TruncateTime(string dateTime)
+        {
+            return DateTime.Parse(dateTime).ToString("yyyy/MM/dd");
         }
     }
 }
