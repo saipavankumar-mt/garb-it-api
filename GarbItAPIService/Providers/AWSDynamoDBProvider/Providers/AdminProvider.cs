@@ -1,4 +1,5 @@
-﻿using Contracts.Interfaces;
+﻿using Contracts;
+using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,12 +13,14 @@ namespace AWSDynamoDBProvider.Providers
     {
         private IDataService _dataService;
         private IPasswordProvider _passwordProvider;
+        private IForgotPasswordProvider _forgotPasswordProvider;
         private AWSDynamoDBSettings _settings;
 
-        public AdminProvider(IDataService dataService, IPasswordProvider passwordProvider, IOptions<AWSDynamoDBSettings> options)
+        public AdminProvider(IDataService dataService, IPasswordProvider passwordProvider, IForgotPasswordProvider forgotPasswordProvider, IOptions<AWSDynamoDBSettings> options)
         {
             _dataService = dataService;
             _passwordProvider = passwordProvider;
+            _forgotPasswordProvider = forgotPasswordProvider;
             _settings = options.Value;
         }
 
@@ -37,9 +40,21 @@ namespace AWSDynamoDBProvider.Providers
             return response;
         }
 
+        public async Task<int> GetAdminsCount(string reportsToId = "")
+        {
+            if (string.IsNullOrEmpty(reportsToId))
+            {
+                return await _dataService.GetDataCount(_settings.TableNames.AdminTable);
+            }
+            else
+            {
+                return await _dataService.GetDataCount(_settings.TableNames.AdminTable, "ReportsToId", reportsToId);
+            }
+        }
+
         public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable, _settings.NextIdGeneratorValue.Admin);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable, _settings.UserIdPrefix.Admin, _settings.NextIdGeneratorValue.Admin);
 
             var req = adminInfo.ToDBModel(nextId);
 
@@ -113,6 +128,46 @@ namespace AWSDynamoDBProvider.Providers
             };
         }
 
-        
+        public async Task<SuccessResponse> UpdateAdminPasswordAsync(UpdatePasswordRequest req)
+        {
+            var adminInfo = await GetAdminInfoAsync(req.Id);
+            adminInfo.Password = req.NewPassword;
+
+            adminInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
+            adminInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
+            adminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+
+            var passwordInfo = await _passwordProvider.GetUserPassword(adminInfo.UserName);
+            passwordInfo.Password = req.NewPassword;
+
+            await UpdateAdminAsync(adminInfo);
+            var response = await _passwordProvider.UpdatePasswordAsync(passwordInfo);
+            return new SuccessResponse() { Success = true };
+        }
+
+        public async Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req)
+        {
+            var adminInfo = await GetAdminInfoAsync(req.Id);
+            adminInfo.SecretQuestions = req.QuestionIds;
+            adminInfo.SecretAnswers = req.Answers;
+
+            await UpdateAdminAsync(adminInfo);
+            return new SuccessResponse() { Success = true };
+        }
+
+        public async Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id)
+        {
+            var response = new List<SecretQuestion>();
+
+            var adminInfo = await GetAdminInfoAsync(id);
+            var questionIds = adminInfo.SecretQuestions;
+
+            foreach (var qId in questionIds)
+            {
+                response.Add(await _forgotPasswordProvider.GetSecretQuestionByIdAsync(qId));
+            }
+
+            return response;
+        }
     }
 }

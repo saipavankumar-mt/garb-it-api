@@ -11,5 +11,9 @@ namespace Contracts.Interfaces
         Task<SuperAdminInfo> GetSuperAdminInfoAsync();
 
         Task<AddUserResponse> AddSuperAdminAsync(SuperAdminAddRequest req);
+
+        Task<AddUserResponse> UpdateSuperAdminAsync(SuperAdminInfo superAdminInfo);
+
+        Task<SuccessResponse> UpdateSuperAdminPasswordAsync(UpdatePasswordRequest req);
     }
 }

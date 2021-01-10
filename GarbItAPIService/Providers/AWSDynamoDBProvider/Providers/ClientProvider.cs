@@ -19,6 +19,28 @@ namespace AWSDynamoDBProvider.Providers
             _settings = options.Value;
         }
 
+        public async Task<List<ClientInfo>> SearchClientAsync(List<SearchRequest> searchRequests)
+        {
+            var response = new List<ClientInfo>();
+
+            response = await _dataService.SearchData<ClientInfo>(_settings.TableNames.ClientTable, searchRequests);
+
+            return response;
+        }
+
+        public async Task<int> SearchClientCountAsync(SearchRequest searchRequest=null)
+        {
+            if (searchRequest != null && !string.IsNullOrEmpty(searchRequest.SearchByKey) && !string.IsNullOrEmpty(searchRequest.SearchByValue))
+            {
+
+                return await _dataService.GetDataCount(_settings.TableNames.ClientTable, searchRequest.SearchByKey, searchRequest.SearchByValue);
+            }
+            else
+            {
+                return await _dataService.GetDataCount(_settings.TableNames.ClientTable);
+            }
+        }
+
         public async Task<ClientInfo> GetClientInfoAsync(string qrCodeId)
         {
             return await _dataService.GetDataById<ClientInfo>(qrCodeId, _settings.TableNames.ClientTable);
@@ -26,7 +48,7 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable, _settings.NextIdGeneratorValue.Client);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable, _settings.UserIdPrefix.Client, _settings.NextIdGeneratorValue.Client, "D8");
 
             var req = clientInfo.ToDBModel(nextId);
 
@@ -58,5 +80,7 @@ namespace AWSDynamoDBProvider.Providers
 
             return new AddClientResponse();
         }
+
+        
     }
 }

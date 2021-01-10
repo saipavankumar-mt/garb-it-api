@@ -44,5 +44,20 @@ namespace GarbItAPIService.Controllers
             var result = await _superAdminService.GetSuperAdminInfoAsync();
             return Ok(result);
         }
+
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateSuperAdminAsync([FromBody] SuperAdminInfo superAdminInfo, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _superAdminService.UpdateSuperAdminAsync(superAdminInfo);
+            return Ok(result);
+        }
+
+
+        [HttpPost("updatepassword")]
+        public async Task<IActionResult> UpdateAdminPasswordAsync([FromBody] UpdatePasswordRequest req, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _superAdminService.UpdateSuperAdminPasswordAsync(req);
+            return Ok(result);
+        }
     }
 }

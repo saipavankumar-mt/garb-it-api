@@ -36,6 +36,9 @@ namespace GarbItAPIService.Code
             services.AddTransient<IClientService, ClientService.ClientService>();
             services.AddTransient<IClientProvider, AWSDynamoDBProvider.Providers.ClientProvider>();
 
+            services.AddTransient<IForgotPasswordService, ForgotPasswordService.ForgotPasswordService>();
+            services.AddTransient<IForgotPasswordProvider, AWSDynamoDBProvider.Providers.ForgotPasswordProvider>();
+
 
         }
     }

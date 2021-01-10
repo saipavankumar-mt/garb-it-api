@@ -15,5 +15,9 @@ namespace Contracts.Interfaces
         Task<AdminInfo> GetAdminInfoAsync(string id);
         Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id);
         Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo);
+        Task<CountResponse> GetAdminsCountAsync();
+        Task<SuccessResponse> UpdateAdminPasswordAsync(UpdatePasswordRequest req);
+        Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req);
+        Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id);
     }
 }

@@ -10,21 +10,26 @@ namespace ClientService
     {
         public static ClientInfo ToCoreModel(this ClientAddRequest req)
         {
+            var userInfo = AmbientContext.Current.UserInfo;
             var clientInfo = new ClientInfo()
             {
                 Name = req.Name,
                 PhoneNumber = req.PhoneNumber,
+                Gender = req.Gender,
+                DateOfBirth = req.DateOfBirth,
+                Married = req.Married,
                 Location = req.Location,
                 Municipality = req.Municipality,
+                Address = req.Address,
                 City = req.City,
                 State = req.State,
                 Country = req.Country,
-                CreatedById = AmbientContext.Current.UserId,
-                CreatedByName = AmbientContext.Current.UserName,
-                CreatedDateTime = DateTime.Now.ToString(),
-                UpdatedById = AmbientContext.Current.UserId,
-                UpdatedByName = AmbientContext.Current.UserName,
-                UpdatedDateTime = DateTime.Now.ToString(),
+                CreatedById = userInfo.Id,
+                CreatedByName = userInfo.Name,
+                CreatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
+                UpdatedById = userInfo.Id,
+                UpdatedByName = userInfo.Name,
+                UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
             };
 
             return clientInfo;

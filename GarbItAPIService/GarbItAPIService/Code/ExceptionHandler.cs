@@ -20,10 +20,9 @@ namespace GarbItAPIService.Code
             catch (Exception ex)
             {
                 Error errResponse = new Error() { Message = ex.Message };
-                var res = JsonConvert.SerializeObject(new ApiSuccessResponse<Error>(errResponse) { Status = Status.Failure });
+                var res = JsonConvert.SerializeObject(new ApiSuccessResponse<Error>(errResponse) { Status = Status.Failure }, new Newtonsoft.Json.Converters.StringEnumConverter());
                 context.Response.ContentType = "application/json";
                 await context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(res));
-
             }
         }
     }

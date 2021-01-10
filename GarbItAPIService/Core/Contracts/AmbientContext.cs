@@ -12,9 +12,7 @@ namespace Contracts
         private static readonly AsyncLocal<AmbientContext> ScopeStack = new AsyncLocal<AmbientContext>();
 
         public string ApiSessionId { get; set; }
-        public string UserId { get; set; }
-        public string UserName { get; set; }
-        public Role Role { get; set; }
+        public UserInfo UserInfo { get; set; }
 
 
         public AmbientContext(AmbientContext ambientContext)

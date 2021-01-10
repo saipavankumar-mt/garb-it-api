@@ -24,9 +24,23 @@ namespace SuperAdminService
 
         public async Task<SuperAdminInfo> GetSuperAdminInfoAsync()
         {
-            var userId = AmbientContext.Current.UserId;
+            var userId = AmbientContext.Current.UserInfo.Id;
 
             return await _superAdminProvider.GetSuperAdminInfoAsync(userId);
+        }
+
+        public async Task<AddUserResponse> UpdateSuperAdminAsync(SuperAdminInfo superAdminInfo)
+        {
+            superAdminInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
+            superAdminInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
+            superAdminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+
+            return await _superAdminProvider.UpdateSuperAdminAsync(superAdminInfo);
+        }
+
+        public async Task<SuccessResponse> UpdateSuperAdminPasswordAsync(UpdatePasswordRequest req)
+        {
+            return await _superAdminProvider.UpdateSuperAdminPasswordAsync(req);
         }
     }
 }

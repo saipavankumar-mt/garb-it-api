@@ -1,4 +1,5 @@
-﻿using Contracts.Interfaces;
+﻿using Contracts;
+using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
 using System;
@@ -38,14 +39,37 @@ namespace AWSDynamoDBProvider.Providers
 
         }
 
+        public async Task<int> GetEmployeeCountAsync(string reportsToId = "")
+        {
+            if (string.IsNullOrEmpty(reportsToId))
+            {
+                return await _dataService.GetDataCount(_settings.TableNames.EmployeeTable);
+            }
+            else
+            {
+                return await _dataService.GetDataCount(_settings.TableNames.EmployeeTable, "ReportsToId", reportsToId);
+            }
+        }
+
+        public async Task<List<EmployeeInfo>> SearchEmployeesAsync(List<SearchRequest> searchRequests)
+        {
+            var response = new List<EmployeeInfo>();
+
+            response = await _dataService.SearchData<EmployeeInfo>(_settings.TableNames.EmployeeTable, searchRequests);
+
+            return response;
+        }
+
         public async Task<EmployeeInfo> GetEmployeeInfoAsync(string id)
         {
             return await _dataService.GetDataById<EmployeeInfo>(id, _settings.TableNames.EmployeeTable);
         }
 
+        
+
         public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable, _settings.NextIdGeneratorValue.Employee);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable, _settings.UserIdPrefix.Employee, _settings.NextIdGeneratorValue.Employee);
 
             var req = employeeInfo.ToDBModel(nextId);
 
@@ -101,6 +125,22 @@ namespace AWSDynamoDBProvider.Providers
             return new RemoveUserResponse();
         }
 
+        public async Task<SuccessResponse> UpdateEmployeePasswordAsync(UpdatePasswordRequest req)
+        {
+            var userInfo = await GetEmployeeInfoAsync(req.Id);
+            userInfo.Password = req.NewPassword;
+
+            userInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
+            userInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
+            userInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+
+            var passwordInfo = await _passwordProvider.GetUserPassword(userInfo.UserName);
+            passwordInfo.Password = req.NewPassword;
+
+            await UpdateEmployeeAsync(userInfo);
+            var response = await _passwordProvider.UpdatePasswordAsync(passwordInfo);
+            return new SuccessResponse() { Success = true };
+        }
 
         private static PasswordInfo GetPasswordEntry(Model.EmployeeInfo req)
         {
@@ -113,5 +153,7 @@ namespace AWSDynamoDBProvider.Providers
                 Name = req.Name
             };
         }
+
+        
     }
 }

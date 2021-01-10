@@ -28,13 +28,18 @@ namespace EmployeeService
 
         public async Task<List<EmployeeInfo>> GetEmployees()
         {
-            var adminId = AmbientContext.Current.UserId;
+            var adminId = AmbientContext.Current.UserInfo.Id;
             return await _employeeProvider.GetEmployees(adminId);
         }
 
         public async Task<List<EmployeeInfo>> GetAllEmployees()
         {
             return await _employeeProvider.GetEmployees();
+        }
+
+        public async Task<List<EmployeeInfo>> SearchEmployeesAsync(List<SearchRequest> searchRequests)
+        {
+            return await _employeeProvider.SearchEmployeesAsync(searchRequests);
         }
 
         public async Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id)
@@ -44,11 +49,25 @@ namespace EmployeeService
 
         public async Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo)
         {
-            employeeInfo.UpdatedById = AmbientContext.Current.UserId;
-            employeeInfo.UpdatedByName = AmbientContext.Current.UserName;
-            employeeInfo.UpdatedDateTime = DateTime.Now.ToString();
+            employeeInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
+            employeeInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
+            employeeInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
 
             return await _employeeProvider.UpdateEmployeeAsync(employeeInfo);
+        }
+
+        public async Task<CountResponse> GetEmployeesCountAsync()
+        {
+            var count = await _employeeProvider.GetEmployeeCountAsync(AmbientContext.Current.UserInfo.Id);
+            return new CountResponse()
+            {
+                Count = count
+            };
+        }
+
+        public async Task<SuccessResponse> UpdateEmployeePasswordAsync(UpdatePasswordRequest req)
+        {
+            return await _employeeProvider.UpdateEmployeePasswordAsync(req);
         }
     }
 }

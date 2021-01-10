@@ -10,12 +10,16 @@ namespace AdminService
     {
         public static AdminInfo ToCoreModel(this AdminAddRequest req)
         {
+            var userInfo = AmbientContext.Current.UserInfo;
             var adminInfo = new AdminInfo()
             {
                 Name = req.Name,
                 UserName = req.UserName,
                 Password = req.Password,
                 PhoneNumber = req.PhoneNumber,
+                Gender = req.Gender,
+                DateOfBirth = req.DateOfBirth,
+                Married = req.Married,
                 Role = req.Role,
                 Designation = req.Designation,
                 Department = req.Department,
@@ -24,14 +28,14 @@ namespace AdminService
                 City = req.City,
                 State = req.State,
                 Country = req.Country,
-                ReportsToId = AmbientContext.Current.UserId,
-                ReportsToName = AmbientContext.Current.UserName,
-                CreatedById = AmbientContext.Current.UserId,
-                CreatedByName = AmbientContext.Current.UserName,
-                CreatedDateTime = DateTime.Now.ToString(),
-                UpdatedById = AmbientContext.Current.UserId,
-                UpdatedByName = AmbientContext.Current.UserName,
-                UpdatedDateTime = DateTime.Now.ToString(),
+                ReportsToId = userInfo.Id,
+                ReportsToName = userInfo.Name,
+                CreatedById = userInfo.Id,
+                CreatedByName = userInfo.Name,
+                CreatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
+                UpdatedById = userInfo.Id,
+                UpdatedByName = userInfo.Name,
+                UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
             };
 
             return adminInfo;

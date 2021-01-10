@@ -9,5 +9,9 @@ namespace Contracts.Interfaces
     public interface IRecordEntryProvider
     {
         Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo);
+
+        Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
+
+        Task<List<RecordEntryInfo>> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
     }
 }

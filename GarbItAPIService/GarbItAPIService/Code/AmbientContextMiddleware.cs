@@ -57,10 +57,6 @@ namespace GarbItAPIService.Code
 
                     if (userProfile != null)
                     {
-                        ambientContext.Role = userProfile.Role;
-                        ambientContext.UserId = userProfile.UserId;
-                        ambientContext.UserName = userProfile.UserName;
-                        
                         await next(context);
                     }
                     else

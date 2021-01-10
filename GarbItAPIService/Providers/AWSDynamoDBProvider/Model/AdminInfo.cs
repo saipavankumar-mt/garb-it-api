@@ -12,7 +12,8 @@ namespace AWSDynamoDBProvider.Model
 
         }
 
-        
+        public List<string> SecretQuestions { get; set; }
+        public List<string> SecretAnswers { get; set; }
         public string ReportsToId { get; set; }
         public string ReportsToName { get; set; }
         

@@ -71,16 +71,39 @@ namespace GarbItAPIService.Controllers
         }
 
 
-        /// <summary>
-        /// Can be accessed only by Super Admin to delete particular Admin by Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="sessionKey"></param>
-        /// <returns></returns>
+        [HttpPost("updatepassword")]
+        public async Task<IActionResult> UpdateAdminPasswordAsync([FromBody] UpdatePasswordRequest req, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _adminService.UpdateAdminPasswordAsync(req);
+            return Ok(result);
+        }
+
+        [HttpPost("updatesecretquestions")]
+        public async Task<IActionResult> UpdateSecretQuestionsAsync([FromBody] AddUserSecretQuestionsRequest req, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _adminService.UpdateSecretQuestionsAsync(req);
+            return Ok(result);
+        }
+
+        [HttpGet("usersecretquestions/{id}")]
+        public async Task<IActionResult> GetUserSecretQuestionsAsync(string id, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _adminService.GetUserSecretQuestionsAsync(id);
+            return Ok(result);
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveAdmin(string id, [FromHeader(Name = "session-key")] string sessionKey)
         {
             var result = await _adminService.RemoveAdminInfoByIdAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> GetAdminsCountAsync([FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _adminService.GetAdminsCountAsync();
             return Ok(result);
         }
     }

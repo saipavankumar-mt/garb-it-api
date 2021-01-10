@@ -15,6 +15,9 @@ namespace AWSDynamoDBProvider
                 Name = req.Name,
                 UserName = req.UserName,
                 Password = req.Password,
+                Gender = req.Gender,
+                DateOfBirth = req.DateOfBirth,
+                Married = req.Married,
                 PhoneNumber = req.PhoneNumber,
                 Role = req.Role.ToString(),
                 Designation = req.Designation,
@@ -26,7 +29,7 @@ namespace AWSDynamoDBProvider
                 Country = req.Country,
                 CreatedById = req.CreatedById,
                 CreatedByName = req.CreatedByName,
-                CreatedDateTime = DateTime.Now.ToString()                
+                CreatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm")                
             };
 
             return dbModel;

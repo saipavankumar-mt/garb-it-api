@@ -14,5 +14,8 @@ namespace Contracts.Interfaces
         Task<AddUserResponse> AddEmployee(EmployeeAddRequest employeeAddRequest);
         Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id);
         Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo);
+        Task<List<EmployeeInfo>> SearchEmployeesAsync(List<SearchRequest> searchRequests);
+        Task<CountResponse> GetEmployeesCountAsync();
+        Task<SuccessResponse> UpdateEmployeePasswordAsync(UpdatePasswordRequest req);
     }
 }

@@ -16,6 +16,8 @@ namespace AWSDynamoDBProvider.Model
 
         public string Role { get; set; }
 
+        public string UserFullName { get; set; }
+
         [DynamoDBProperty("ExpiryTime", true)]
         public string ExpiryTime { get; set; }
     }

@@ -10,11 +10,16 @@ namespace Contracts.Interfaces
     {
         Task<List<T>> GetData<T>(string tableName);
         Task<List<T>> GetData<T>(string tableName, string relationshipKey, string relationshipId);
+        Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null);
+        Task<List<T>> SearchData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null);
         Task<bool> UpdateData<T>(T req, string tableName);
         Task<bool> SaveData<T>(T req, string tableName);
         Task<T> GetDataById<T>(string id, string tableName);
         Task<T> GetDataByUserName<T>(string userName, string tableName);
-        Task<string> GetNextId(string tableName, int initialNextId);
+        Task<string> GetNextId(string tableName, string prefix, int initialNextId, string decimalFactor="D4");
         Task<bool> RemoveDataByIdAsync<T>(string id, string tableName);
+        Task<int> GetDataCount(string tableName);
+        Task<int> GetDataCount(string tableName, string filterKey = "", string filterValue = "");
+        Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null);
     }
 }

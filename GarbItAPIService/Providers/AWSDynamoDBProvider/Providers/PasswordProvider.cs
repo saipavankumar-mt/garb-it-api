@@ -31,12 +31,18 @@ namespace AWSDynamoDBProvider.Providers
         {
             var response = await _dataService.GetDataByUserName<PasswordRegistry>(userName, _settings.TableNames.PasswordRegistryTable);
 
-            return response.ToEntityModel();
+            return response?.ToEntityModel();
         }
 
         public async Task<bool> RemoveUserFromPasswordRegistry(string userName)
         {
             return await _dataService.RemoveDataByIdAsync<PasswordRegistry>(userName, _settings.TableNames.PasswordRegistryTable);
+        }
+
+        public async Task<bool> UpdatePasswordAsync(PasswordInfo passwordInfo)
+        {
+            var req = passwordInfo.ToDBModel();
+            return await _dataService.UpdateData<PasswordRegistry>(req, _settings.TableNames.PasswordRegistryTable);
         }
     }
 }

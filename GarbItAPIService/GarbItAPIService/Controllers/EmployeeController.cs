@@ -43,6 +43,13 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+        [HttpPost("search")]
+        public async Task<IActionResult> SearchEmployeesAsync([FromHeader(Name = "session-key")] string sessionKey, [FromBody] List<SearchRequest> searchRequests)
+        {
+            var result = await _employeeService.SearchEmployeesAsync(searchRequests);
+            return Ok(result);
+        }
+
         /// <summary>
         /// Can be accessed by Admin to Get employee info by EmployeeId
         /// </summary>
@@ -82,6 +89,15 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+
+        [HttpPost("updatepassword")]
+        public async Task<IActionResult> UpdateEmployeePasswordAsync([FromBody] UpdatePasswordRequest req, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _employeeService.UpdateEmployeePasswordAsync(req);
+            return Ok(result);
+        }
+
+
         /// <summary>
         /// Can be accessed by Admin to remove an employee under him by Id
         /// </summary>
@@ -92,6 +108,13 @@ namespace GarbItAPIService.Controllers
         public async Task<IActionResult> RemoveEmployee(string id, [FromHeader(Name = "session-key")] string sessionKey)
         {
             var result = await _employeeService.RemoveEmployeeInfoByIdAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> GetEmployeesCountAsync([FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _employeeService.GetEmployeesCountAsync();
             return Ok(result);
         }
     }

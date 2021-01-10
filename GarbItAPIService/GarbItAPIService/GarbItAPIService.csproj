@@ -17,6 +17,7 @@
     <ProjectReference Include="..\Services\AdminService\AdminService.csproj" />
     <ProjectReference Include="..\Services\ClientService\ClientService.csproj" />
     <ProjectReference Include="..\Services\EmployeeService\EmployeeService.csproj" />
+    <ProjectReference Include="..\Services\ForgotPasswordService\ForgotPasswordService.csproj" />
     <ProjectReference Include="..\Services\RecordEntryService\RecordEntryService.csproj" />
     <ProjectReference Include="..\Services\SessionService\SessionService.csproj" />
     <ProjectReference Include="..\Services\SuperAdminService\SuperAdminService.csproj" />

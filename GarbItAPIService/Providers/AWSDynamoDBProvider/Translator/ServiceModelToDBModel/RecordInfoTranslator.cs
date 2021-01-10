@@ -17,7 +17,8 @@ namespace AWSDynamoDBProvider
                 EmployeeId = req.EmployeeId,
                 EmployeeName = req.EmployeeName,
                 Location = req.Location,
-                ScannedDateTime = DateTime.Now.ToString()
+                Municipality = req.Municipality,
+                ScannedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
             };
 
             return dbModel;

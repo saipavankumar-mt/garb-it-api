@@ -1,4 +1,5 @@
 ﻿using AWSDynamoDBProvider.Model;
+using Contracts;
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
@@ -23,10 +24,10 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable, _settings.NextIdGeneratorValue.Record);
+            var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable, _settings.UserIdPrefix.Record, _settings.NextIdGeneratorValue.Record, "D8");
 
             var req = recordInfo.ToDBModel(nextId);
-            if(await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
+            if (await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
             {
                 return new AddRecordResponse()
                 {
@@ -35,6 +36,16 @@ namespace AWSDynamoDBProvider.Providers
             }
 
             return new AddRecordResponse();
+        }
+
+        public async Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
+        {
+            return await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
+        }
+
+        public async Task<List<RecordEntryInfo>> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
+        {
+            return await _dataService.SearchData<RecordEntryInfo>(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
         }
     }
 }

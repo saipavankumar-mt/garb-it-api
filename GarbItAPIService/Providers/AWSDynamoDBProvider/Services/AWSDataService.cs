@@ -36,7 +36,6 @@ namespace AWSDynamoDBProvider.Services
             }
 
             return true;
-
         }
 
         public async Task<List<T>> GetData<T>(string tableName)
@@ -73,6 +72,7 @@ namespace AWSDynamoDBProvider.Services
             var result = new List<T>();
 
             Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
 
             ScanFilter scanFilter = new ScanFilter();
             scanFilter.AddCondition(relationshipKey, ScanOperator.Equal, relationshipId);
@@ -143,8 +143,125 @@ namespace AWSDynamoDBProvider.Services
             }
         }
 
+        public async Task<int> GetDataCount(string tableName)
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
 
-        public async Task<string> GetNextId(string tableName, int initialNextId)
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+            var count = table.Scan(new ScanOperationConfig()).Count;
+
+            await Task.Delay(0);
+            return count;
+        }
+
+        public async Task<int> GetDataCount(string tableName, string filterKey = "", string filterValue = "")
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+
+            ScanFilter scanFilter = new ScanFilter();
+            scanFilter.AddCondition(filterKey, ScanOperator.Equal, filterValue);
+
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter
+            };
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+            var count = table.Scan(config).Count;
+
+            await Task.Delay(0);
+            return count;
+        }
+
+        public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+
+            var scanFilter = BuildScanFilter(searchRequests);
+            scanFilter.AddCondition(dateKey, ScanOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
+
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter
+            };
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+            var count = table.Scan(config).Count;
+
+            await Task.Delay(0);
+            return count;
+        }
+
+        public async Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null)
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+            var result = new List<T>();
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+            var scanFilter = BuildScanFilter(searchRequests);
+
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter
+            };
+
+            Search search = table.Scan(config);
+
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                do
+                {
+                    var documentList = await search.GetNextSetAsync();
+
+                    foreach (var document in documentList)
+                    {
+                        var typedDoc = dbContext.FromDocument<T>(document);
+                        result.Add(typedDoc);
+                    }
+
+                } while (!search.IsDone);
+            }
+
+            return result;
+        }
+
+        public async Task<List<T>> SearchData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+            var result = new List<T>();
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+            var scanFilter = BuildScanFilter(searchRequests);
+            scanFilter.AddCondition(dateKey, ScanOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
+
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter
+            };
+
+            Search search = table.Scan(config);
+
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                do
+                {
+                    var documentList = await search.GetNextSetAsync();
+
+                    foreach (var document in documentList)
+                    {
+                        var typedDoc = dbContext.FromDocument<T>(document);
+                        result.Add(typedDoc);
+                    }
+
+                } while (!search.IsDone);
+            }
+
+            return result;
+        }
+
+        public async Task<string> GetNextId(string tableName, string prefix, int initialNextId, string decimalFactor)
         {
             int nextId;
             using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
@@ -168,7 +285,30 @@ namespace AWSDynamoDBProvider.Services
                     nextId = doc.NextId;
                 }
             }
-            return nextId.ToString();
+            return prefix + nextId.ToString(decimalFactor);
+        }
+
+        private static ScanFilter BuildScanFilter(List<SearchRequest> searchRequests)
+        {
+            ScanFilter scanFilter = new ScanFilter();
+            if (searchRequests != null && searchRequests.Count > 0)
+            {
+                foreach (var item in searchRequests)
+                {
+                    if (!string.IsNullOrEmpty(item.SearchByKey) && !string.IsNullOrEmpty(item.SearchByValue))
+                    {
+                        var op = ScanOperator.Equal;
+                        if (item.SearchByKey == "Name")
+                        {
+                            op = ScanOperator.Contains;
+                        }
+
+                        scanFilter.AddCondition(item.SearchByKey, op, item.SearchByValue);
+                    }
+                }
+            }
+
+            return scanFilter;
         }
     }
 }

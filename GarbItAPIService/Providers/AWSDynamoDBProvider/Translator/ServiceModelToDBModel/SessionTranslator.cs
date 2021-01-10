@@ -19,6 +19,7 @@ namespace AWSDynamoDBProvider
                 SessionId = guid,
                 UserName = req.UserName,
                 UserId = req.UserId,
+                UserFullName = req.UserFullName,
                 Role = req.Role.ToString(),
                 ExpiryTime = epochSeconds.ToString()
             };
@@ -33,6 +34,7 @@ namespace AWSDynamoDBProvider
                 SessionId = req.SessionId,
                 UserName = req.UserName,
                 UserId = req.UserId,
+                UserFullName = req.UserFullName,
                 Role = Enum.Parse<Role>(req.Role)
             };
 

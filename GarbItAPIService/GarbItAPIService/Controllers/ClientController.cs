@@ -46,6 +46,13 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+        [HttpPost("search")]
+        public async Task<IActionResult> SearchClientAsync([FromHeader(Name = "session-key")] string sessionKey, [FromBody] List<SearchRequest> searchRequests)
+        {
+            var result = await _clientService.SearchClientAsync(searchRequests);
+            return Ok(result);
+        }
+
         /// <summary>
         /// Accessed by Admin to Update Client info
         /// </summary>
@@ -59,5 +66,11 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
+        [HttpGet("count")]
+        public async Task<IActionResult> GetClientsCountAsync([FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _clientService.GetClientsCountAsync();
+            return Ok(result);
+        }
     }
 }

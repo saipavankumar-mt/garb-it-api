@@ -14,5 +14,7 @@ namespace Contracts.Interfaces
         Task<PasswordInfo> GetUserPassword(string userName);
 
         Task<bool> RemoveUserFromPasswordRegistry(string userName);
+
+        Task<bool> UpdatePasswordAsync(PasswordInfo passwordInfo);
     }
 }
