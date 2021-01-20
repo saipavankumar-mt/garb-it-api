@@ -12,6 +12,8 @@ namespace Contracts.Interfaces
 
         Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
 
-        Task<List<RecordEntryInfo>> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
+        Task<SearchedRecordsResponse> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime, int limit = 20, string paginationToken = "");
+
+        Task<List<RecordEntryInfo>> ExportRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
     }
 }

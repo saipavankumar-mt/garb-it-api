@@ -25,8 +25,16 @@ namespace RecordEntryService
 
             var clientInfo = await _clientProvider.GetClientInfoAsync(qrCodeId);
 
-            //Get Employee Info from Session key
+            //Check if record already scanned for today
 
+            var record = await ExportRecordsAsync(new List<SearchRequest>() { new SearchRequest() { SearchByKey = "ClientId", SearchByValue = clientInfo.Id } }, DateTime.Today.ToString(), DateTime.Now.ToString());
+
+            if(record != null && record.Count > 0)
+            {
+                throw new Exception("Record already exist. Client is already scanned for today");
+            }
+
+            //Add record to table
             var recordInfo = new RecordEntryInfo()
             {
                 ClientId = clientInfo.Id,
@@ -43,7 +51,7 @@ namespace RecordEntryService
         public async Task<CountResponse> GetActiveClientsCountAsync()
         {
             var countResponse = new CountResponse();
-            var recordsInfo = await SearchRecordAsync(new List<SearchRequest>(), DateTime.Today.AddMonths(-1).ToString(), DateTime.Today.ToString());
+            var recordsInfo = await ExportRecordsAsync(new List<SearchRequest>(), DateTime.Today.AddMonths(-1).ToString(), DateTime.Today.ToString());
 
             if(recordsInfo != null)
             {
@@ -55,7 +63,7 @@ namespace RecordEntryService
 
         public async Task<List<EmployeeScannedCountResponse>> GetEmployeesScannedCountAsync(string fromDate, string toDate)
         {
-            var recordsInfo = await SearchRecordAsync(new List<SearchRequest>(), fromDate, toDate);
+            var recordsInfo = await ExportRecordsAsync(new List<SearchRequest>(), fromDate, toDate);
             if (recordsInfo != null)
             {
                 var employeeGroup = recordsInfo.GroupBy(x => x.EmployeeName).Select(x => new EmployeeScannedCountResponse() { EmployeeName = x.Key, Count = x.Count() });
@@ -101,7 +109,7 @@ namespace RecordEntryService
                 searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
             }
 
-            var recordsCollected = await _recordEntryProvider.GetCollectedRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+            var recordsCollected = await _recordEntryProvider.ExportRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
 
             var response = new List<RecordScannedDayCountResponse>();
 
@@ -110,7 +118,7 @@ namespace RecordEntryService
             return groupedResponse.ToList();
         }
 
-        public async Task<List<RecordEntryInfo>> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate)
+        public async Task<SearchedRecordsResponse> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate, int limit = 20, string paginationToken="")
         {
             if(searchRequests == null)
             {
@@ -128,9 +136,30 @@ namespace RecordEntryService
                 searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
             }
 
-            return await _recordEntryProvider.GetCollectedRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+            return await _recordEntryProvider.GetCollectedRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate), limit, paginationToken);
         }
 
+
+        public async Task<List<RecordEntryInfo>> ExportRecordsAsync(List<SearchRequest> searchRequests, string fromDate, string toDate)
+        {
+            if (searchRequests == null)
+            {
+                searchRequests = new List<SearchRequest>();
+            }
+
+            var role = AmbientContext.Current.UserInfo.Role;
+            if (role.Equals(Role.SuperAdmin))
+            {
+                searchRequests.Add(new SearchRequest() { SearchByKey = "Location", SearchByValue = AmbientContext.Current.UserInfo.Location });
+            }
+
+            if (role.Equals(Role.Admin))
+            {
+                searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
+            }
+
+            return await _recordEntryProvider.ExportRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+        }
 
         private string TruncateTime(string dateTime)
         {

@@ -28,9 +28,16 @@ namespace GarbItAPIService.Controllers
         }
 
         [HttpPost("search")]
-        public async Task<IActionResult> SearchRecordAsync([FromQuery]string fromDate, [FromQuery] string toDate, [FromBody] List<SearchRequest> searchRequests, [FromHeader(Name = "session-key")] string sessionKey)
+        public async Task<IActionResult> SearchRecordAsync([FromQuery]string fromDate, [FromQuery] string toDate,  [FromBody] List<SearchRequest> searchRequests, [FromHeader(Name = "session-key")] string sessionKey, [FromQuery] int limit = 20, [FromQuery] string paginationToken = "")
         {
-            var result = await _recordEntryService.SearchRecordAsync(searchRequests, fromDate, toDate);
+            var result = await _recordEntryService.SearchRecordAsync(searchRequests, fromDate, toDate, limit, paginationToken);
+            return Ok(result);
+        }
+
+        [HttpPost("export")]
+        public async Task<IActionResult> ExportRecordAsync([FromQuery] string fromDate, [FromQuery] string toDate,  [FromBody] List<SearchRequest> searchRequests, [FromHeader(Name = "session-key")] string sessionKey)
+        {
+            var result = await _recordEntryService.ExportRecordsAsync(searchRequests, fromDate, toDate);
             return Ok(result);
         }
 

@@ -18,7 +18,7 @@ namespace AWSDynamoDBProvider.Model
         public string ClientName { get; set; }
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
-        [DynamoDBLocalSecondaryIndexRangeKey("ScannedDateTime")]
+        [DynamoDBRangeKey("ScannedDateTime")]
         public string ScannedDateTime { get; set; }
         public string Municipality { get; set; }
         public string Location { get; set; }

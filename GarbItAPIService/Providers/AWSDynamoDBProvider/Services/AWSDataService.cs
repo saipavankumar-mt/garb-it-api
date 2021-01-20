@@ -226,7 +226,50 @@ namespace AWSDynamoDBProvider.Services
             return result;
         }
 
-        public async Task<List<T>> SearchData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+
+        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 20, string paginationToken="")
+        {
+            string paginationResultToken;
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+            var result = new List<T>();
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+            var scanFilter = BuildScanFilter(searchRequests);
+            scanFilter.AddCondition(dateKey, ScanOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
+
+            
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter,
+                Limit = limit
+            };
+
+            if(!string.IsNullOrEmpty(paginationToken))
+            {
+                config.PaginationToken = paginationToken;
+            }
+
+            Search search = table.Scan(config);
+
+
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                var documentList = await search.GetNextSetAsync();
+                paginationResultToken = search.PaginationToken;
+
+                foreach (var document in documentList)
+                {
+                    var typedDoc = dbContext.FromDocument<T>(document);
+                    result.Add(typedDoc);
+                }
+                
+            }
+
+            return (result, paginationResultToken);
+        }
+
+        public async Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
         {
             _dynamoDbOperationConfig.OverrideTableName = tableName;
             var result = new List<T>();
@@ -238,7 +281,7 @@ namespace AWSDynamoDBProvider.Services
 
             ScanOperationConfig config = new ScanOperationConfig()
             {
-                Filter = scanFilter
+                Filter = scanFilter,
             };
 
             Search search = table.Scan(config);
@@ -256,6 +299,7 @@ namespace AWSDynamoDBProvider.Services
                     }
 
                 } while (!search.IsDone);
+
             }
 
             return result;
@@ -309,6 +353,29 @@ namespace AWSDynamoDBProvider.Services
             }
 
             return scanFilter;
+        }
+
+        private static QueryFilter BuildQueryFilter(List<SearchRequest> searchRequests)
+        {
+            QueryFilter queryFilter = new QueryFilter();
+            if (searchRequests != null && searchRequests.Count > 0)
+            {
+                foreach (var item in searchRequests)
+                {
+                    if (!string.IsNullOrEmpty(item.SearchByKey) && !string.IsNullOrEmpty(item.SearchByValue))
+                    {
+                        var op = QueryOperator.Equal;
+                        if (item.SearchByKey == "Name")
+                        {
+                            op = QueryOperator.BeginsWith;
+                        }
+
+                        queryFilter.AddCondition(item.SearchByKey, op, item.SearchByValue);
+                    }
+                }
+            }
+
+            return queryFilter;
         }
     }
 }
