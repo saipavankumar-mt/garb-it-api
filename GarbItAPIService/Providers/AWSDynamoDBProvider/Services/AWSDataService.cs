@@ -229,41 +229,78 @@ namespace AWSDynamoDBProvider.Services
 
         public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 20, string paginationToken="")
         {
-            string paginationResultToken;
+            string paginationResultToken = "";
             _dynamoDbOperationConfig.OverrideTableName = tableName;
             var result = new List<T>();
 
             Table table = Table.LoadTable(this._dynamoDbClient, tableName);
 
-            var scanFilter = BuildScanFilter(searchRequests);
-            scanFilter.AddCondition(dateKey, ScanOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
-
-            
-            ScanOperationConfig config = new ScanOperationConfig()
+            if(searchRequests!=null && searchRequests.Count >0)
             {
-                Filter = scanFilter,
-                Limit = limit
-            };
-
-            if(!string.IsNullOrEmpty(paginationToken))
-            {
-                config.PaginationToken = paginationToken;
-            }
-
-            Search search = table.Scan(config);
+                var scanFilter = BuildScanFilter(searchRequests);
+                scanFilter.AddCondition(dateKey, ScanOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
 
 
-            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
-            {
-                var documentList = await search.GetNextSetAsync();
-                paginationResultToken = search.PaginationToken;
-
-                foreach (var document in documentList)
+                ScanOperationConfig config = new ScanOperationConfig()
                 {
-                    var typedDoc = dbContext.FromDocument<T>(document);
-                    result.Add(typedDoc);
+                    Filter = scanFilter,
+                    Limit = limit,
+                    ConsistentRead = true
+                };
+
+
+                if (!string.IsNullOrEmpty(paginationToken))
+                {
+                    config.PaginationToken = paginationToken;
                 }
-                
+
+                Search search = table.Scan(config);
+
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    var documentList = await search.GetNextSetAsync();
+                    paginationResultToken = search.PaginationToken;
+
+                    foreach (var document in documentList)
+                    {
+                        var typedDoc = dbContext.FromDocument<T>(document);
+                        result.Add(typedDoc);
+                    }
+
+                }
+            }
+            else
+            {
+                QueryFilter queryFilter = new QueryFilter();
+                queryFilter.AddCondition(dateKey, QueryOperator.Between, new DynamoDBEntry[] { fromDate.ToString("yyyy/MM/dd HH:mm"), toDate.ToString("yyyy/MM/dd HH:mm") });
+
+                QueryOperationConfig config = new QueryOperationConfig()
+                {
+                    Filter = queryFilter,
+                    Limit = limit,
+                    ConsistentRead = true,
+                };
+
+
+                if (!string.IsNullOrEmpty(paginationToken))
+                {
+                    config.PaginationToken = paginationToken;
+                }
+
+                Search search = table.Query(config);
+
+                using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+                {
+                    var documentList = await search.GetNextSetAsync();
+                    paginationResultToken = search.PaginationToken;
+
+                    foreach (var document in documentList)
+                    {
+                        var typedDoc = dbContext.FromDocument<T>(document);
+                        result.Add(typedDoc);
+                    }
+
+                }
             }
 
             return (result, paginationResultToken);
