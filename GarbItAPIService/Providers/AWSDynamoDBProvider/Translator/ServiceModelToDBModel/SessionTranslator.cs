@@ -11,9 +11,6 @@ namespace AWSDynamoDBProvider
     {
         public static Model.SessionInfo ToDBModel(this Contracts.Models.SessionInfo req, string guid)
         {
-            DateTime expirationTime = DateTime.Now.AddMinutes(30);
-            var epochSeconds = AWSSDKUtils.ConvertToUnixEpochSeconds(expirationTime);
-
             var dbModel = new Model.SessionInfo()
             {
                 SessionId = guid,
@@ -21,7 +18,7 @@ namespace AWSDynamoDBProvider
                 UserId = req.UserId,
                 UserFullName = req.UserFullName,
                 Role = req.Role.ToString(),
-                ExpiryTime = epochSeconds.ToString()
+                ExpirationTime = DateTime.Now.AddMinutes(30)
             };
 
             return dbModel;

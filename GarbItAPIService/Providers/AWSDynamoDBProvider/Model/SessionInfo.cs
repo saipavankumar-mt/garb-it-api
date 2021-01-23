@@ -18,7 +18,7 @@ namespace AWSDynamoDBProvider.Model
 
         public string UserFullName { get; set; }
 
-        [DynamoDBProperty("ExpiryTime", true)]
-        public string ExpiryTime { get; set; }
+        [DynamoDBProperty("ExpirationTime", StoreAsEpoch = true)]
+        public DateTime ExpirationTime { get; set; }
     }
 }

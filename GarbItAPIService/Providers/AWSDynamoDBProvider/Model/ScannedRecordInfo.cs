@@ -17,10 +17,14 @@ namespace AWSDynamoDBProvider.Model
         public string ClientId { get; set; }
         public string ClientName { get; set; }
         public string EmployeeId { get; set; }
-        public string EmployeeName { get; set; }
-        [DynamoDBRangeKey("ScannedDateTime")]
-        public string ScannedDateTime { get; set; }
+        public string EmployeeName { get; set; }        
         public string Municipality { get; set; }
         public string Location { get; set; }
+
+        [DynamoDBRangeKey("ScannedDateTime", StoreAsEpoch = true)]
+        public string ScannedDateTime { get; set; }
+
+        [DynamoDBProperty("ExpirationTime", StoreAsEpoch = true)]
+        public DateTime ExpirationTime { get; set; }
     }
 }
