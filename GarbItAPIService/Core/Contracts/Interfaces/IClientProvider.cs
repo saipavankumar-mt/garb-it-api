@@ -11,7 +11,7 @@ namespace Contracts.Interfaces
         Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo);
         Task<ClientInfo> GetClientInfoAsync(string qrCodeId);
         Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo);
-        Task<List<ClientInfo>> SearchClientAsync(List<SearchRequest> searchRequests);
+        Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "");
         Task<int> SearchClientCountAsync(SearchRequest searchRequest=null);
     }
 }

@@ -192,6 +192,46 @@ namespace AWSDynamoDBProvider.Services
             return count;
         }
 
+        public async Task<(List<T>, string)> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "")
+        {
+            _dynamoDbOperationConfig.OverrideTableName = tableName;
+            var result = new List<T>();
+            string paginationResultToken = "";
+
+            Table table = Table.LoadTable(this._dynamoDbClient, tableName);
+
+            var scanFilter = BuildScanFilter(searchRequests);
+
+            ScanOperationConfig config = new ScanOperationConfig()
+            {
+                Filter = scanFilter,
+                Limit = limit,
+                ConsistentRead = true
+            };
+
+            if (!string.IsNullOrEmpty(paginationToken))
+            {
+                config.PaginationToken = paginationToken;
+            }
+
+            Search search = table.Scan(config);
+
+
+            using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
+            {
+                var documentList = await search.GetNextSetAsync();
+                paginationResultToken = search.PaginationToken;
+
+                foreach (var document in documentList)
+                {
+                    var typedDoc = dbContext.FromDocument<T>(document);
+                    result.Add(typedDoc);
+                }
+            }
+
+            return (result, paginationResultToken);
+        }
+
         public async Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null)
         {
             _dynamoDbOperationConfig.OverrideTableName = tableName;
@@ -203,10 +243,12 @@ namespace AWSDynamoDBProvider.Services
 
             ScanOperationConfig config = new ScanOperationConfig()
             {
-                Filter = scanFilter
+                Filter = scanFilter,
+                ConsistentRead = true
             };
 
             Search search = table.Scan(config);
+
 
             using (var dbContext = new DynamoDBContext(this._dynamoDbClient))
             {
@@ -226,8 +268,7 @@ namespace AWSDynamoDBProvider.Services
             return result;
         }
 
-
-        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 20, string paginationToken="")
+        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken="")
         {
             string paginationResultToken = "";
             _dynamoDbOperationConfig.OverrideTableName = tableName;

@@ -56,9 +56,9 @@ namespace ClientService
             return await _clientProvider.RegisterClientAsync(clientInfo);
         }
 
-        public async Task<List<ClientInfo>> SearchClientAsync(List<SearchRequest> searchRequests)
+        public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
         {
-            return await _clientProvider.SearchClientAsync(searchRequests);
+            return await _clientProvider.SearchClientAsync(searchRequests, limit, paginationToken);
         }
 
         public async Task<AddClientResponse> UpdateClientAsync(ClientInfo clientInfo)

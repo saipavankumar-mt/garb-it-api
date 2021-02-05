@@ -19,13 +19,15 @@ namespace AWSDynamoDBProvider.Providers
             _settings = options.Value;
         }
 
-        public async Task<List<ClientInfo>> SearchClientAsync(List<SearchRequest> searchRequests)
+        public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
         {
-            var response = new List<ClientInfo>();
+            var response = await _dataService.SearchData<ClientInfo>(_settings.TableNames.ClientTable, searchRequests, limit, paginationToken);
 
-            response = await _dataService.SearchData<ClientInfo>(_settings.TableNames.ClientTable, searchRequests);
-
-            return response;
+            return new SearchClientsResponse()
+            {
+                ClientInfos = response.Item1,
+                PaginationToken = response.Item2
+            }; 
         }
 
         public async Task<int> SearchClientCountAsync(SearchRequest searchRequest=null)

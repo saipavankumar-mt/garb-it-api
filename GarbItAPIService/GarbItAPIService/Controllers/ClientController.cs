@@ -47,9 +47,9 @@ namespace GarbItAPIService.Controllers
         }
 
         [HttpPost("search")]
-        public async Task<IActionResult> SearchClientAsync([FromHeader(Name = "session-key")] string sessionKey, [FromBody] List<SearchRequest> searchRequests)
+        public async Task<IActionResult> SearchClientAsync([FromHeader(Name = "session-key")] string sessionKey, [FromBody] List<SearchRequest> searchRequests, [FromQuery] int limit = 20, [FromQuery] string paginationToken = "")
         {
-            var result = await _clientService.SearchClientAsync(searchRequests);
+            var result = await _clientService.SearchClientAsync(searchRequests, limit, paginationToken);
             return Ok(result);
         }
 

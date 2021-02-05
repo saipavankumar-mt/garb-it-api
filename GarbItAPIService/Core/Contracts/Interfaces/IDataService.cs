@@ -10,8 +10,10 @@ namespace Contracts.Interfaces
     {
         Task<List<T>> GetData<T>(string tableName);
         Task<List<T>> GetData<T>(string tableName, string relationshipKey, string relationshipId);
+        Task<(List<T>, string)> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "");
+
         Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null);
-        Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 20, string paginationToken = "");
+        Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "");
 
         Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null);
 
