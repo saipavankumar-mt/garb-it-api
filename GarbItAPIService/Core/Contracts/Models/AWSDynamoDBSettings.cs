@@ -22,6 +22,7 @@ namespace Contracts.Models
         public string ClientTable { get; set; }
         public string RecordEntryTable { get; set; }
         public string SecretQuestionsTable { get; set; }
+        public string CountsInfoTable { get; set; }
     }
 
     public class NextIdGeneratorValue

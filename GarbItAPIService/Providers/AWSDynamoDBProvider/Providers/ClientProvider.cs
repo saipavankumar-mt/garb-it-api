@@ -1,4 +1,5 @@
-﻿using Contracts.Interfaces;
+﻿using Contracts;
+using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,11 +13,13 @@ namespace AWSDynamoDBProvider.Providers
     {
         private IDataService _dataService;
         private AWSDynamoDBSettings _settings;
+        private ICountProvider _countProvider;
 
-        public ClientProvider(IDataService dataService, IOptions<AWSDynamoDBSettings> options)
+        public ClientProvider(IDataService dataService, IOptions<AWSDynamoDBSettings> options, ICountProvider countProvider)
         {
             _dataService = dataService;
             _settings = options.Value;
+            _countProvider = countProvider;
         }
 
         public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
@@ -32,15 +35,14 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<int> SearchClientCountAsync(SearchRequest searchRequest=null)
         {
-            if (searchRequest != null && !string.IsNullOrEmpty(searchRequest.SearchByKey) && !string.IsNullOrEmpty(searchRequest.SearchByValue))
+            string counterId = String.Format("{1}-Clients", AmbientContext.Current.UserInfo.Municipality);
+            var countInfo = await _countProvider.GetCountInfoAsync(counterId);
+            if(countInfo!=null)
             {
+                return countInfo.Count;
+            }
 
-                return await _dataService.GetDataCount(_settings.TableNames.ClientTable, searchRequest.SearchByKey, searchRequest.SearchByValue);
-            }
-            else
-            {
-                return await _dataService.GetDataCount(_settings.TableNames.ClientTable);
-            }
+            return 0;
         }
 
         public async Task<ClientInfo> GetClientInfoAsync(string qrCodeId)
@@ -56,6 +58,9 @@ namespace AWSDynamoDBProvider.Providers
 
             if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
             {
+                string counterId = String.Format("{1}-Clients", AmbientContext.Current.UserInfo.Municipality);
+                await _countProvider.IncrementCountAsync(counterId);
+
                 return new AddClientResponse()
                 {
                     Id = req.Id,

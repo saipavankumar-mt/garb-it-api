@@ -14,11 +14,13 @@ namespace AWSDynamoDBProvider.Providers
     {
         private IDataService _dataService;
         private AWSDynamoDBSettings _settings;
+        private ICountProvider _countProvider;
 
-        public RecordEntryProvider(IDataService dataService, IOptions<AWSDynamoDBSettings> options)
+        public RecordEntryProvider(IDataService dataService, IOptions<AWSDynamoDBSettings> options, ICountProvider countProvider)
         {
             _dataService = dataService;
             _settings = options.Value;
+            _countProvider = countProvider;
         }
 
 
@@ -29,6 +31,10 @@ namespace AWSDynamoDBProvider.Providers
             var req = recordInfo.ToDBModel(nextId);
             if (await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
             {
+                string counterId = String.Format("{0}-{1}-Records", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
+
+                await _countProvider.IncrementCountAsync(counterId);
+
                 return new AddRecordResponse()
                 {
                     RecordId = req.RecordId
@@ -42,7 +48,23 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
         {
-            return await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
+            int finalCount = 0;
+
+            while(fromDateTime.Date <= toDateTime.Date)
+            {
+                string counterId = String.Format("{0}-{1}-Records", fromDateTime.Date.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
+
+                var countInfo = await _countProvider.GetCountInfoAsync(counterId);
+                
+                if(countInfo!=null)
+                {
+                    finalCount += countInfo.Count;
+                }
+
+                fromDateTime.Date.AddDays(1);
+            }
+
+            return finalCount;
         }
 
         public async Task<SearchedRecordsResponse> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime, int limit = 20, string paginationToken = "")
