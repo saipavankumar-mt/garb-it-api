@@ -12,6 +12,8 @@ namespace Contracts.Interfaces
 
         Task<int> GetCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime);
 
+        Task<int> GetEmployeeCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime, string employeeName);
+
         Task<SearchedRecordsResponse> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime, int limit = 20, string paginationToken = "");
 
         Task<List<RecordEntryInfo>> ExportRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);

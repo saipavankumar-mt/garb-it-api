@@ -12,11 +12,13 @@ namespace RecordEntryService
     {
         private IRecordEntryProvider _recordEntryProvider;
         private IClientProvider _clientProvider;
+        private IEmployeeProvider _employeeProvider;
 
-        public RecordEntryService(IRecordEntryProvider recordEntryProvider, IClientProvider clientProvider)
+        public RecordEntryService(IRecordEntryProvider recordEntryProvider, IClientProvider clientProvider, IEmployeeProvider employeeProvider)
         {
             _recordEntryProvider = recordEntryProvider;
             _clientProvider = clientProvider;
+            _employeeProvider = employeeProvider;
         }
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(string qrCodeId)
@@ -29,7 +31,7 @@ namespace RecordEntryService
 
             var record = await ExportRecordsAsync(new List<SearchRequest>() { new SearchRequest() { SearchByKey = "ClientId", SearchByValue = clientInfo.Id } }, DateTime.Today.ToString(), DateTime.Now.ToString());
 
-            if(record != null && record.Count > 0)
+            if (record != null && record.Count > 0)
             {
                 throw new Exception("Record already exist. Client is already scanned for today");
             }
@@ -53,7 +55,7 @@ namespace RecordEntryService
             var countResponse = new CountResponse();
             var recordsInfo = await ExportRecordsAsync(new List<SearchRequest>(), DateTime.Today.AddMonths(-1).ToString(), DateTime.Today.ToString());
 
-            if(recordsInfo != null)
+            if (recordsInfo != null)
             {
                 countResponse.Count = recordsInfo.Select(x => x.ClientId).Distinct().Count();
             }
@@ -63,20 +65,24 @@ namespace RecordEntryService
 
         public async Task<List<EmployeeScannedCountResponse>> GetEmployeesScannedCountAsync(string fromDate, string toDate)
         {
-            var recordsInfo = await ExportRecordsAsync(new List<SearchRequest>(), fromDate, toDate);
-            if (recordsInfo != null)
-            {
-                var employeeGroup = recordsInfo.GroupBy(x => x.EmployeeName).Select(x => new EmployeeScannedCountResponse() { EmployeeName = x.Key, Count = x.Count() });
+            var response = new List<EmployeeScannedCountResponse>();
+            var employees = await _employeeProvider.GetEmployees(AmbientContext.Current.UserInfo.Id);
 
-                return employeeGroup?.ToList();
+            foreach (var employee in employees)
+            {
+                response.Add(new EmployeeScannedCountResponse()
+                {
+                    EmployeeName = employee.Name,
+                    Count = await _recordEntryProvider.GetEmployeeCollectedCountAsync(DateTime.Parse(fromDate), DateTime.Parse(toDate), employee.Name)
+                });
             }
 
-            return new List<EmployeeScannedCountResponse>();
+            return response;
         }
 
         public async Task<CountResponse> GetScannedRecordsCountAsync(string fromDate, string toDate)
         {
-            var role = AmbientContext.Current.UserInfo.Role;            
+            var role = AmbientContext.Current.UserInfo.Role;
 
             var count = await _recordEntryProvider.GetCollectedCountAsync(DateTime.Parse(fromDate), DateTime.Parse(toDate));
             return new CountResponse()
@@ -92,7 +98,7 @@ namespace RecordEntryService
 
             var response = new List<RecordScannedDayCountResponse>();
 
-            while(startDate <= endDate)
+            while (startDate <= endDate)
             {
                 response.Add(new RecordScannedDayCountResponse()
                 {
@@ -106,9 +112,9 @@ namespace RecordEntryService
             return response;
         }
 
-        public async Task<SearchedRecordsResponse> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate, int limit = 20, string paginationToken="")
+        public async Task<SearchedRecordsResponse> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate, int limit = 20, string paginationToken = "")
         {
-            if(searchRequests == null)
+            if (searchRequests == null)
             {
                 searchRequests = new List<SearchRequest>();
             }

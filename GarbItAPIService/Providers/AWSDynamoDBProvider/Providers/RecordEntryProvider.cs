@@ -30,10 +30,16 @@ namespace AWSDynamoDBProvider.Providers
 
             var req = recordInfo.ToDBModel(nextId);
             if (await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
-            {
+            { 
+                //Increment record counter
                 string counterId = String.Format("{0}-{1}-Records", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
 
                 await _countProvider.IncrementCountAsync(counterId);
+
+                //Increment Employee Scan counter
+                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, AmbientContext.Current.UserInfo.Name);
+
+                await _countProvider.IncrementCountAsync(employeeCounterId);
 
                 return new AddRecordResponse()
                 {
@@ -43,8 +49,6 @@ namespace AWSDynamoDBProvider.Providers
 
             return new AddRecordResponse();
         }
-
-
 
         public async Task<int> GetCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime)
         {
@@ -88,6 +92,28 @@ namespace AWSDynamoDBProvider.Providers
         public async Task<List<RecordEntryInfo>> ExportRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
         {
             return await _dataService.ExportData<RecordEntryInfo>(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
+        }
+
+        public async Task<int> GetEmployeeCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime, string employeeName)
+        {
+            int finalCount = 0;
+            DateTime startDate = fromDateTime.Date;
+
+            while (startDate <= toDateTime.Date)
+            {
+                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, employeeName);
+
+                var countInfo = await _countProvider.GetCountInfoAsync(employeeCounterId);
+
+                if (countInfo != null)
+                {
+                    finalCount += countInfo.Count;
+                }
+
+                startDate = startDate.Date.AddDays(1);
+            }
+
+            return finalCount;
         }
     }
 }
