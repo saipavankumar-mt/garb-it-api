@@ -35,7 +35,7 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<int> SearchClientCountAsync(SearchRequest searchRequest=null)
         {
-            string counterId = String.Format("{1}-Clients", AmbientContext.Current.UserInfo.Municipality);
+            string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
             var countInfo = await _countProvider.GetCountInfoAsync(counterId);
             if(countInfo!=null)
             {
@@ -58,7 +58,7 @@ namespace AWSDynamoDBProvider.Providers
 
             if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
             {
-                string counterId = String.Format("{1}-Clients", AmbientContext.Current.UserInfo.Municipality);
+                string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
                 await _countProvider.IncrementCountAsync(counterId);
 
                 return new AddClientResponse()
