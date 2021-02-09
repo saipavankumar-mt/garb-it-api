@@ -10,7 +10,7 @@ namespace Contracts.Interfaces
     {
         Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo);
 
-        Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime);
+        Task<int> GetCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime);
 
         Task<SearchedRecordsResponse> GetCollectedRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime, int limit = 20, string paginationToken = "");
 

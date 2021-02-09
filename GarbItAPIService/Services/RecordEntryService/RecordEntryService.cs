@@ -76,19 +76,9 @@ namespace RecordEntryService
 
         public async Task<CountResponse> GetScannedRecordsCountAsync(string fromDate, string toDate)
         {
-            var role = AmbientContext.Current.UserInfo.Role;
-            var searchRequests = new List<SearchRequest>();
-            if (role.Equals(Role.SuperAdmin))
-            {
-                searchRequests.Add(new SearchRequest() { SearchByKey = "Location", SearchByValue = AmbientContext.Current.UserInfo.Location });
-            }
+            var role = AmbientContext.Current.UserInfo.Role;            
 
-            if (role.Equals(Role.Admin))
-            {
-                searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
-            }
-
-            var count = await _recordEntryProvider.GetCollectedCountAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+            var count = await _recordEntryProvider.GetCollectedCountAsync(DateTime.Parse(fromDate), DateTime.Parse(toDate));
             return new CountResponse()
             {
                 Count = count
@@ -97,25 +87,23 @@ namespace RecordEntryService
 
         public async Task<List<RecordScannedDayCountResponse>> GetScannedRecordsDayCountAsync(string fromDate, string toDate)
         {
-            var role = AmbientContext.Current.UserInfo.Role;
-            var searchRequests = new List<SearchRequest>();
-            if (role.Equals(Role.SuperAdmin))
-            {
-                searchRequests.Add(new SearchRequest() { SearchByKey = "Location", SearchByValue = AmbientContext.Current.UserInfo.Location });
-            }
-
-            if (role.Equals(Role.Admin))
-            {
-                searchRequests.Add(new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality });
-            }
-
-            var recordsCollected = await _recordEntryProvider.ExportRecordsAsync(searchRequests, DateTime.Parse(fromDate), DateTime.Parse(toDate));
+            var startDate = DateTime.Parse(fromDate);
+            var endDate = DateTime.Parse(toDate);
 
             var response = new List<RecordScannedDayCountResponse>();
 
-            var groupedResponse = recordsCollected.GroupBy(x=> TruncateTime(x.ScannedDateTime)).Select(x => new RecordScannedDayCountResponse() { Date = x.Key, Count = x.Count() });
+            while(startDate <= endDate)
+            {
+                response.Add(new RecordScannedDayCountResponse()
+                {
+                    Date = startDate.ToString("yyyy-MM-dd"),
+                    Count = await _recordEntryProvider.GetCollectedCountAsync(startDate, endDate)
+                });
 
-            return groupedResponse.ToList();
+                startDate = startDate.AddDays(1);
+            }
+
+            return response;
         }
 
         public async Task<SearchedRecordsResponse> SearchRecordAsync(List<SearchRequest> searchRequests, string fromDate, string toDate, int limit = 20, string paginationToken="")

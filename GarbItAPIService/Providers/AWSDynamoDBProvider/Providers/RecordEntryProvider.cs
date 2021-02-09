@@ -46,11 +46,12 @@ namespace AWSDynamoDBProvider.Providers
 
 
 
-        public async Task<int> GetCollectedCountAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
+        public async Task<int> GetCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime)
         {
             int finalCount = 0;
+            DateTime startDate = fromDateTime.Date;
 
-            while(fromDateTime.Date <= toDateTime.Date)
+            while (startDate <= toDateTime.Date)
             {
                 string counterId = String.Format("{0}-{1}-Records", fromDateTime.Date.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
 
@@ -61,7 +62,7 @@ namespace AWSDynamoDBProvider.Providers
                     finalCount += countInfo.Count;
                 }
 
-                fromDateTime.Date.AddDays(1);
+                startDate = startDate.Date.AddDays(1);
             }
 
             return finalCount;
