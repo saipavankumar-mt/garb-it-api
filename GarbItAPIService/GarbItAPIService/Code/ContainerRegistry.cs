@@ -39,7 +39,7 @@ namespace GarbItAPIService.Code
             services.AddTransient<IForgotPasswordService, ForgotPasswordService.ForgotPasswordService>();
             services.AddTransient<IForgotPasswordProvider, AWSDynamoDBProvider.Providers.ForgotPasswordProvider>();
 
-
+            services.AddTransient<ICountProvider, AWSDynamoDBProvider.Providers.CountProvider>();
         }
     }
 }
