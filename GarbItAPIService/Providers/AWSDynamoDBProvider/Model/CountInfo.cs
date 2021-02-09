@@ -10,5 +10,8 @@ namespace AWSDynamoDBProvider.Model
         [DynamoDBHashKey("Id")]
         public string Id { get; set; }
         public int Count { get; set; }
+
+        [DynamoDBProperty("ExpirationTime", StoreAsEpoch = true)]
+        public DateTime ExpirationTime { get; set; }
     }
 }

@@ -25,23 +25,29 @@ namespace AWSDynamoDBProvider.Providers
             return await _dataService.GetDataById<CountInfo>(id, _settings.TableNames.CountsInfoTable);
         }
 
-        public async Task IncrementCountAsync(string id)
+        public async Task IncrementCountAsync(string id, bool setExpiry = true)
         {
             var countInfo = await _dataService.GetDataById<CountInfo>(id, _settings.TableNames.CountsInfoTable);
             if (countInfo == null)
             {
-                countInfo = new CountInfo()
+                var dbCountInfo = new AWSDynamoDBProvider.Model.CountInfo()
                 {
                     Id = id,
                     Count = 1
                 };
+
+                if(setExpiry)
+                {
+                    dbCountInfo.ExpirationTime = DateTime.Now.AddDays(30);
+                }
+
+                await _dataService.UpdateData(dbCountInfo, _settings.TableNames.CountsInfoTable);
             }
             else
             {
                 countInfo.Count++;
+                await _dataService.UpdateData(countInfo, _settings.TableNames.CountsInfoTable);
             }
-            
-            await _dataService.UpdateData(countInfo, _settings.TableNames.CountsInfoTable);
         }
     }
 }

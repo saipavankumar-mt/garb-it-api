@@ -18,7 +18,7 @@ namespace AWSDynamoDBProvider
                 UserId = req.UserId,
                 UserFullName = req.UserFullName,
                 Role = req.Role.ToString(),
-                ExpirationTime = DateTime.Now.AddMinutes(30)
+                ExpirationTime = DateTime.Now.AddDays(1)
             };
 
             return dbModel;

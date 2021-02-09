@@ -10,6 +10,6 @@ namespace Contracts.Interfaces
     {
         Task<CountInfo> GetCountInfoAsync(string id);
 
-        Task IncrementCountAsync(string id);
+        Task IncrementCountAsync(string id, bool setExpiry = true);
     }
 }

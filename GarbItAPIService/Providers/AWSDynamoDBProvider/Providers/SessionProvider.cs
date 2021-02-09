@@ -43,10 +43,6 @@ namespace AWSDynamoDBProvider.Providers
             if (user != null)
             {
                 var sessionResponse = await SaveSessionAsync(loginRequest, user);
-
-                
-                
-
                 return sessionResponse;
             }
 

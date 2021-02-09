@@ -59,7 +59,7 @@ namespace AWSDynamoDBProvider.Providers
             if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
             {
                 string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
-                await _countProvider.IncrementCountAsync(counterId);
+                await _countProvider.IncrementCountAsync(counterId, false);
 
                 return new AddClientResponse()
                 {
