@@ -57,7 +57,7 @@ namespace AWSDynamoDBProvider.Providers
 
             while (startDate <= toDateTime.Date)
             {
-                string counterId = String.Format("{0}-{1}-Records", fromDateTime.Date.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
+                string counterId = String.Format("{0}-{1}-Records", startDate.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
 
                 var countInfo = await _countProvider.GetCountInfoAsync(counterId);
                 
@@ -101,7 +101,7 @@ namespace AWSDynamoDBProvider.Providers
 
             while (startDate <= toDateTime.Date)
             {
-                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, employeeName);
+                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", startDate.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, employeeName);
 
                 var countInfo = await _countProvider.GetCountInfoAsync(employeeCounterId);
 
