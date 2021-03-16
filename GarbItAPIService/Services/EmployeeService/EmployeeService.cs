@@ -39,6 +39,17 @@ namespace EmployeeService
 
         public async Task<List<EmployeeInfo>> SearchEmployeesAsync(List<SearchRequest> searchRequests)
         {
+            if (searchRequests == null)
+            {
+                searchRequests = new List<SearchRequest>();
+            }
+
+            searchRequests.Add(new SearchRequest()
+            {
+                SearchByKey = "Municipality",
+                SearchByValue = AmbientContext.Current.UserInfo.Municipality
+            });
+
             return await _employeeProvider.SearchEmployeesAsync(searchRequests);
         }
 
