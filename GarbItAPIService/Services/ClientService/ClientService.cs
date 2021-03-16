@@ -58,6 +58,17 @@ namespace ClientService
 
         public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
         {
+            if(searchRequests == null)
+            {
+                searchRequests = new List<SearchRequest>();
+            }
+
+            searchRequests.Add(new SearchRequest()
+            {
+                SearchByKey = "Municipality",
+                SearchByValue = AmbientContext.Current.UserInfo.Municipality
+            });
+
             return await _clientProvider.SearchClientAsync(searchRequests, limit, paginationToken);
         }
 
