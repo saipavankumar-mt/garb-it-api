@@ -2,12 +2,13 @@
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class ClientProvider : IClientProvider
     {
@@ -52,20 +53,15 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.ClientTable, _settings.UserIdPrefix.Client, _settings.NextIdGeneratorValue.Client, "D8");
-
-            var req = clientInfo.ToDBModel(nextId);
-
-            if (await _dataService.SaveData(req, _settings.TableNames.ClientTable))
+            if (await _dataService.SaveDataSql(_settings.TableNames.ClientTable, clientInfo.ToInsertSqlCmdParams()))
             {
                 string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
                 await _countProvider.IncrementCountAsync(counterId, false);
 
                 return new AddClientResponse()
                 {
-                    Id = req.Id,
-                    Name = req.Name,
-                    QRCodeId = req.QRCodeId
+                    Name = clientInfo.Name,
+                    QRCodeId = clientInfo.QRCodeId
                 };
             }
 
@@ -74,14 +70,13 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo)
         {
-            var req = updateInfo.ToDBModel();
-            if (await _dataService.UpdateData(req, _settings.TableNames.ClientTable))
+            if (await _dataService.UpdateDataSql(_settings.TableNames.ClientTable, updateInfo.Id, updateInfo.ToUpdateSqlCmdParams()))
             {
                 return new AddClientResponse()
                 {
-                    Id = req.Id,
-                    Name = req.Name,
-                    QRCodeId = req.QRCodeId
+                    Id = updateInfo.Id,
+                    Name = updateInfo.Name,
+                    QRCodeId = updateInfo.QRCodeId
                 };
             }
 

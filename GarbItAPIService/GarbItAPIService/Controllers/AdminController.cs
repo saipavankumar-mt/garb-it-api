@@ -78,20 +78,6 @@ namespace GarbItAPIService.Controllers
             return Ok(result);
         }
 
-        [HttpPost("updatesecretquestions")]
-        public async Task<IActionResult> UpdateSecretQuestionsAsync([FromBody] AddUserSecretQuestionsRequest req, [FromHeader(Name = "session-key")] string sessionKey)
-        {
-            var result = await _adminService.UpdateSecretQuestionsAsync(req);
-            return Ok(result);
-        }
-
-        [HttpGet("usersecretquestions/{id}")]
-        public async Task<IActionResult> GetUserSecretQuestionsAsync(string id, [FromHeader(Name = "session-key")] string sessionKey)
-        {
-            var result = await _adminService.GetUserSecretQuestionsAsync(id);
-            return Ok(result);
-        }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveAdmin(string id, [FromHeader(Name = "session-key")] string sessionKey)
@@ -106,5 +92,19 @@ namespace GarbItAPIService.Controllers
             var result = await _adminService.GetAdminsCountAsync();
             return Ok(result);
         }
+
+        //[HttpPost("updatesecretquestions")]
+        //public async Task<IActionResult> UpdateSecretQuestionsAsync([FromBody] AddUserSecretQuestionsRequest req, [FromHeader(Name = "session-key")] string sessionKey)
+        //{
+        //    var result = await _adminService.UpdateSecretQuestionsAsync(req);
+        //    return Ok(result);
+        //}
+
+        //[HttpGet("usersecretquestions/{id}")]
+        //public async Task<IActionResult> GetUserSecretQuestionsAsync(string id, [FromHeader(Name = "session-key")] string sessionKey)
+        //{
+        //    var result = await _adminService.GetUserSecretQuestionsAsync(id);
+        //    return Ok(result);
+        //}
     }
 }

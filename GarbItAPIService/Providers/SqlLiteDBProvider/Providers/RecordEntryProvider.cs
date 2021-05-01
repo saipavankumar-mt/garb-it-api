@@ -1,14 +1,14 @@
-﻿using AWSDynamoDBProvider.Model;
-using Contracts;
+﻿using Contracts;
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class RecordEntryProvider : IRecordEntryProvider
     {
@@ -26,10 +26,7 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.RecordEntryTable, _settings.UserIdPrefix.Record, _settings.NextIdGeneratorValue.Record, "D8");
-
-            var req = recordInfo.ToDBModel(nextId);
-            if (await _dataService.SaveData<ScannedRecordInfo>(req, _settings.TableNames.RecordEntryTable))
+            if (await _dataService.SaveDataSql(_settings.TableNames.RecordEntryTable, recordInfo.ToInsertSqlCmdParams()))
             { 
                 //Increment record counter
                 string counterId = String.Format("{0}-{1}-Records", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
@@ -41,10 +38,7 @@ namespace AWSDynamoDBProvider.Providers
 
                 await _countProvider.IncrementCountAsync(employeeCounterId);
 
-                return new AddRecordResponse()
-                {
-                    RecordId = req.RecordId
-                };
+                return new AddRecordResponse();
             }
 
             return new AddRecordResponse();

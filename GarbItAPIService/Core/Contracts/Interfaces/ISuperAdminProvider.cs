@@ -10,6 +10,8 @@ namespace Contracts.Interfaces
     {
         Task<SuperAdminInfo> GetSuperAdminInfoAsync(string id);
 
+        Task<SuperAdminInfo> GetSuperAdminInfoByUserNameAsync(string userName);
+
         Task<AddUserResponse> AddSuperAdmin(SuperAdminInfo superAdminInfo);
 
         Task<AddUserResponse> UpdateSuperAdminAsync(SuperAdminInfo superAdminInfo);

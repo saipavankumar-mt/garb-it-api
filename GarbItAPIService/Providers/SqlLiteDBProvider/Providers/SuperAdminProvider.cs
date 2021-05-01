@@ -2,12 +2,13 @@
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class SuperAdminProvider : ISuperAdminProvider
     {
@@ -27,21 +28,21 @@ namespace AWSDynamoDBProvider.Providers
             return await _dataService.GetDataById<SuperAdminInfo>(id, _settings.TableNames.SuperAdminTable);
         }
 
+        public async Task<SuperAdminInfo> GetSuperAdminInfoByUserNameAsync(string userName)
+        {
+            return await _dataService.GetDataByUserName<SuperAdminInfo>(userName, _settings.TableNames.SuperAdminTable);
+        }
+
         public async Task<AddUserResponse> AddSuperAdmin(SuperAdminInfo superAdminInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.SuperAdminTable, _settings.UserIdPrefix.SuperAdmin, _settings.NextIdGeneratorValue.SuperAdmin);
-
-            var req = superAdminInfo.ToDBModel(nextId);
-
-            if (await _dataService.SaveData(req, _settings.TableNames.SuperAdminTable))
+            if (await _dataService.SaveDataSql(_settings.TableNames.SuperAdminTable, superAdminInfo.ToInsertSqlCmdParams()))
             {
-                var passwordEntry = GetPasswordEntry(req);
+                var passwordEntry = GetPasswordEntry(superAdminInfo);
                 if (await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
                     return new AddUserResponse()
                     {
-                        Id = nextId,
-                        Name = req.Name
+                        Name = superAdminInfo.Name
                     };
                 }
             }
@@ -51,21 +52,19 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> UpdateSuperAdminAsync(SuperAdminInfo superAdminInfo)
         {
-            var req = superAdminInfo.ToDBModel();
-
-            if (await _dataService.UpdateData(req, _settings.TableNames.SuperAdminTable))
+            if (await _dataService.UpdateDataSql(_settings.TableNames.SuperAdminTable, superAdminInfo.Id, superAdminInfo.ToUpdateSqlCmdParams()))
             {
                 return new AddUserResponse()
                 {
-                    Id = req.Id,
-                    Name = req.Name
+                    Id = superAdminInfo.Id,
+                    Name = superAdminInfo.Name
                 };
             }
 
             return new AddUserResponse();
         }
 
-        private static PasswordInfo GetPasswordEntry(Model.SuperAdminInfo req)
+        private static PasswordInfo GetPasswordEntry(SuperAdminInfo req)
         {
             return new PasswordInfo()
             {
@@ -94,9 +93,5 @@ namespace AWSDynamoDBProvider.Providers
             return new SuccessResponse() { Success = true };
         }
 
-        public Task<SuperAdminInfo> GetSuperAdminInfoByUserNameAsync(string userName)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

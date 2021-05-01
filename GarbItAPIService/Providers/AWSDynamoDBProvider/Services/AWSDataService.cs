@@ -18,9 +18,9 @@ namespace AWSDynamoDBProvider.Services
     {
         IAmazonDynamoDB _dynamoDbClient;
         DynamoDBOperationConfig _dynamoDbOperationConfig;
-        private AWSDynamoDBSettings _settings;
+        private DBSettings _settings;
 
-        public AWSDataService(IAmazonDynamoDB dynamoDb, IOptions<AWSDynamoDBSettings> options)
+        public AWSDataService(IAmazonDynamoDB dynamoDb, IOptions<DBSettings> options)
         {
             this._dynamoDbClient = dynamoDb;
             _dynamoDbOperationConfig = new DynamoDBOperationConfig();
@@ -154,7 +154,7 @@ namespace AWSDynamoDBProvider.Services
             return count;
         }
 
-        public async Task<int> GetDataCount(string tableName, string filterKey = "", string filterValue = "")
+        public async Task<int> GetDataCount(string tableName, string filterKey, string filterValue)
         {
             _dynamoDbOperationConfig.OverrideTableName = tableName;
 
@@ -454,6 +454,21 @@ namespace AWSDynamoDBProvider.Services
             }
 
             return queryFilter;
+        }
+
+        public Task<bool> UpdateDataSql(string tableName, string id, string cmdParams)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> SaveDataSql<T>(string tableName, string cmdParams)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> SaveDataSql(string tableName, string cmdParams)
+        {
+            throw new NotImplementedException();
         }
     }
 }

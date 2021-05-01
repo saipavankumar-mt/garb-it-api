@@ -50,10 +50,7 @@ namespace GarbItAPIService
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-            services.Configure<AWSDynamoDBSettings>(Configuration.GetSection("AWSDynamoDBSettings"));
-
-            // Aws DynamoDb service setup
-            services.AwsDynamoDbServiceSetup(Configuration);
+            services.Configure<DBSettings>(Configuration.GetSection("DBSettings"));
 
             services.AddSwaggerDocument();
 

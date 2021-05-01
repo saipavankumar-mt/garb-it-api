@@ -28,7 +28,7 @@ namespace AWSDynamoDBProvider
         {
             var entityModel = new Contracts.Models.SessionInfo()
             {
-                SessionId = req.SessionId,
+                Id = req.SessionId,
                 UserName = req.UserName,
                 UserId = req.UserId,
                 UserFullName = req.UserFullName,

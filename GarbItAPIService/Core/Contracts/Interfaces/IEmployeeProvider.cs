@@ -10,6 +10,7 @@ namespace Contracts.Interfaces
     {
         Task<List<EmployeeInfo>> GetEmployees(string reportsToId = "");
         Task<EmployeeInfo> GetEmployeeInfoAsync(string id);
+        Task<EmployeeInfo> GetEmployeeInfoByUserNameAsync(string userName);
         Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo);
         Task<RemoveUserResponse> RemoveEmployeeInfoByIdAsync(string id);
         Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo);

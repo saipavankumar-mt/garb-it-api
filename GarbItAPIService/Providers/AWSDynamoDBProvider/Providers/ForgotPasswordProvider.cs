@@ -12,9 +12,9 @@ namespace AWSDynamoDBProvider.Providers
     public class ForgotPasswordProvider : IForgotPasswordProvider
     {
         private IDataService _dataService;
-        private AWSDynamoDBSettings _settings;
+        private DBSettings _settings;
 
-        public ForgotPasswordProvider(IDataService dataService, IOptions<AWSDynamoDBSettings> options)
+        public ForgotPasswordProvider(IDataService dataService, IOptions<DBSettings> options)
         {
             _dataService = dataService;
             _settings = options.Value;

@@ -61,14 +61,14 @@ namespace AdminService
             return await _adminProvider.UpdateAdminPasswordAsync(req);
         }
 
-        public async Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req)
-        {
-            return await _adminProvider.UpdateSecretQuestionsAsync(req);
-        }
+        //public async Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req)
+        //{
+        //    return await _adminProvider.UpdateSecretQuestionsAsync(req);
+        //}
 
-        public async Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id)
-        {
-            return await _adminProvider.GetUserSecretQuestionsAsync(id);
-        }
+        //public async Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id)
+        //{
+        //    return await _adminProvider.GetUserSecretQuestionsAsync(id);
+        //}
     }
 }

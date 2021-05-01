@@ -28,7 +28,11 @@ namespace SuperAdminService
                 State = req.State,
                 Country = req.Country,
                 CreatedById = "Installer",
-                CreatedByName = "Installer"
+                CreatedByName = "Installer",
+                UpdatedById = "Installer",
+                UpdatedByName = "Installer",
+                CreatedDateTime = DateTime.Now.ToString(),
+                UpdatedDateTime = DateTime.Now.ToString()
             };
 
             return superAdminInfo;

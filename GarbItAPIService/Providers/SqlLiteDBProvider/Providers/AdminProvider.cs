@@ -2,25 +2,24 @@
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class AdminProvider : IAdminProvider
     {
         private IDataService _dataService;
         private IPasswordProvider _passwordProvider;
-        private IForgotPasswordProvider _forgotPasswordProvider;
         private DBSettings _settings;
 
-        public AdminProvider(IDataService dataService, IPasswordProvider passwordProvider, IForgotPasswordProvider forgotPasswordProvider, IOptions<DBSettings> options)
+        public AdminProvider(IDataService dataService, IPasswordProvider passwordProvider, IOptions<DBSettings> options)
         {
             _dataService = dataService;
             _passwordProvider = passwordProvider;
-            _forgotPasswordProvider = forgotPasswordProvider;
             _settings = options.Value;
         }
 
@@ -54,19 +53,14 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> AddAdmin(AdminInfo adminInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.AdminTable, _settings.UserIdPrefix.Admin, _settings.NextIdGeneratorValue.Admin);
-
-            var req = adminInfo.ToDBModel(nextId);
-
-            if(await _dataService.SaveData(req, _settings.TableNames.AdminTable))
+            if(await _dataService.SaveDataSql(_settings.TableNames.AdminTable, adminInfo.ToInsertSqlCmdParams()))
             {
-                var passwordEntry = GetPasswordEntry(req);
+                var passwordEntry = GetPasswordEntry(adminInfo);
                 if(await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
                     return new AddUserResponse()
                     {
-                        Id = nextId,
-                        Name = req.Name
+                        Name = adminInfo.Name
                     };
                 }
             }
@@ -76,14 +70,12 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo)
         {
-            var req = adminInfo.ToDBModel();
-
-            if (await _dataService.UpdateData(req, _settings.TableNames.AdminTable))
+            if (await _dataService.UpdateDataSql(_settings.TableNames.AdminTable, adminInfo.Id, adminInfo.ToUpdateSqlCmdParams()))
             {
                 return new AddUserResponse()
                 {
-                    Id = req.Id,
-                    Name = req.Name
+                    Id = adminInfo.Id,
+                    Name = adminInfo.Name
                 };
             }
 
@@ -116,7 +108,7 @@ namespace AWSDynamoDBProvider.Providers
             return new RemoveUserResponse();
         }
 
-        private static PasswordInfo GetPasswordEntry(Model.AdminInfo req)
+        private static PasswordInfo GetPasswordEntry(AdminInfo req)
         {
             return new PasswordInfo()
             {
@@ -145,34 +137,9 @@ namespace AWSDynamoDBProvider.Providers
             return new SuccessResponse() { Success = true };
         }
 
-        public async Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req)
+        public async Task<AdminInfo> GetAdminInfoByUserNameAsync(string userName)
         {
-            var adminInfo = await GetAdminInfoAsync(req.Id);
-            adminInfo.SecretQuestions = req.QuestionIds;
-            adminInfo.SecretAnswers = req.Answers;
-
-            await UpdateAdminAsync(adminInfo);
-            return new SuccessResponse() { Success = true };
-        }
-
-        public async Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id)
-        {
-            var response = new List<SecretQuestion>();
-
-            var adminInfo = await GetAdminInfoAsync(id);
-            var questionIds = adminInfo.SecretQuestions;
-
-            foreach (var qId in questionIds)
-            {
-                response.Add(await _forgotPasswordProvider.GetSecretQuestionByIdAsync(qId));
-            }
-
-            return response;
-        }
-
-        public Task<AdminInfo> GetAdminInfoByUserNameAsync(string userName)
-        {
-            throw new NotImplementedException();
+            return await _dataService.GetDataByUserName<AdminInfo>(userName, _settings.TableNames.AdminTable);
         }
     }
 }

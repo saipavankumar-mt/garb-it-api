@@ -2,12 +2,13 @@
 using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class EmployeeProvider : IEmployeeProvider
     {
@@ -69,18 +70,13 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> AddEmployee(EmployeeInfo employeeInfo)
         {
-            var nextId = await _dataService.GetNextId(_settings.TableNames.EmployeeTable, _settings.UserIdPrefix.Employee, _settings.NextIdGeneratorValue.Employee);
-
-            var req = employeeInfo.ToDBModel(nextId);
-
-            if (await _dataService.SaveData(req, _settings.TableNames.EmployeeTable))
+            if (await _dataService.SaveDataSql(_settings.TableNames.EmployeeTable, employeeInfo.ToInsertSqlCmdParams()))
             {
-                var passwordEntry = GetPasswordEntry(req);
+                var passwordEntry = GetPasswordEntry(employeeInfo);
                 if (await _passwordProvider.AddUserToRegistry(passwordEntry))
                 {
                     return new AddUserResponse() { 
-                        Id = req.Id,
-                        Name = req.Name
+                        Name = employeeInfo.Name
                     };
                 }
             }
@@ -90,14 +86,12 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<AddUserResponse> UpdateEmployeeAsync(EmployeeInfo employeeInfo)
         {
-            var req = employeeInfo.ToDBModel();
-
-            if (await _dataService.UpdateData(req, _settings.TableNames.EmployeeTable))
+            if (await _dataService.UpdateDataSql(_settings.TableNames.EmployeeTable, employeeInfo.Id, employeeInfo.ToUpdateSqlCmdParams()))
             {
                 return new AddUserResponse()
                 {
-                    Id = req.Id,
-                    Name = req.Name
+                    Id = employeeInfo.Id,
+                    Name = employeeInfo.Name
                 };
             }
 
@@ -142,7 +136,7 @@ namespace AWSDynamoDBProvider.Providers
             return new SuccessResponse() { Success = true };
         }
 
-        private static PasswordInfo GetPasswordEntry(Model.EmployeeInfo req)
+        private static PasswordInfo GetPasswordEntry(EmployeeInfo req)
         {
             return new PasswordInfo()
             {
@@ -154,9 +148,9 @@ namespace AWSDynamoDBProvider.Providers
             };
         }
 
-        public Task<EmployeeInfo> GetEmployeeInfoByUserNameAsync(string userName)
+        public async Task<EmployeeInfo> GetEmployeeInfoByUserNameAsync(string userName)
         {
-            throw new NotImplementedException();
+            return await _dataService.GetDataByUserName<EmployeeInfo>(userName, _settings.TableNames.EmployeeTable);
         }
     }
 }

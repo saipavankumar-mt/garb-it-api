@@ -1,13 +1,13 @@
-﻿using AWSDynamoDBProvider.Model;
-using Contracts.Interfaces;
+﻿using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class PasswordProvider : IPasswordProvider
     {
@@ -22,27 +22,24 @@ namespace AWSDynamoDBProvider.Providers
 
         public async Task<bool> AddUserToRegistry(PasswordInfo passwordInfo)
         {
-            var req = passwordInfo.ToDBModel();
-            return await _dataService.SaveData(req, _settings.TableNames.PasswordRegistryTable);
-
+            return await _dataService.SaveDataSql(_settings.TableNames.PasswordRegistryTable, passwordInfo.ToInsertSqlCmdParams());
         }
 
         public async Task<PasswordInfo> GetUserPassword(string userName)
         {
-            var response = await _dataService.GetDataByUserName<PasswordRegistry>(userName, _settings.TableNames.PasswordRegistryTable);
+            var response = await _dataService.GetDataByUserName<PasswordInfo>(userName, _settings.TableNames.PasswordRegistryTable);
 
-            return response?.ToEntityModel();
+            return response;
         }
 
         public async Task<bool> RemoveUserFromPasswordRegistry(string userName)
         {
-            return await _dataService.RemoveDataByIdAsync<PasswordRegistry>(userName, _settings.TableNames.PasswordRegistryTable);
+            return await _dataService.RemoveDataByIdAsync<PasswordInfo>(userName, _settings.TableNames.PasswordRegistryTable);
         }
 
         public async Task<bool> UpdatePasswordAsync(PasswordInfo passwordInfo)
         {
-            var req = passwordInfo.ToDBModel();
-            return await _dataService.UpdateData<PasswordRegistry>(req, _settings.TableNames.PasswordRegistryTable);
+            return await _dataService.UpdateDataSql(_settings.TableNames.PasswordRegistryTable, passwordInfo.UserName, passwordInfo.ToUpdateSqlCmdParams());
         }
     }
 }

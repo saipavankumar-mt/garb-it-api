@@ -12,6 +12,8 @@ namespace Contracts.Models
 
         public string Id { get; set; }
 
+        public string Municipality { get; set; }
+
         public Role Role { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Contracts.Interfaces;
 using Contracts.Models;
 using Microsoft.Extensions.Options;
+using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSDynamoDBProvider.Providers
+namespace SQLiteDBProvider.Providers
 {
     public class CountProvider : ICountProvider
     {
@@ -30,23 +31,18 @@ namespace AWSDynamoDBProvider.Providers
             var countInfo = await _dataService.GetDataById<CountInfo>(id, _settings.TableNames.CountsInfoTable);
             if (countInfo == null)
             {
-                var dbCountInfo = new AWSDynamoDBProvider.Model.CountInfo()
+                var dbCountInfo = new CountInfo()
                 {
                     Id = id,
                     Count = 1
                 };
 
-                if(setExpiry)
-                {
-                    dbCountInfo.ExpirationTime = DateTime.Now.AddDays(30);
-                }
-
-                await _dataService.UpdateData(dbCountInfo, _settings.TableNames.CountsInfoTable);
+                await _dataService.SaveDataSql(_settings.TableNames.CountsInfoTable, countInfo.ToInsertSqlCmdParams());
             }
             else
             {
                 countInfo.Count++;
-                await _dataService.UpdateData(countInfo, _settings.TableNames.CountsInfoTable);
+                await _dataService.UpdateDataSql(_settings.TableNames.CountsInfoTable, id, countInfo.ToUpdateSqlCmdParams());
             }
         }
     }

@@ -13,12 +13,13 @@ namespace Contracts.Interfaces
         Task<AddUserResponse> AddAdmin(AdminInfo adminInfo);
 
         Task<AdminInfo> GetAdminInfoAsync(string id);
+
+        Task<AdminInfo> GetAdminInfoByUserNameAsync(string userName);
+
         Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id);
         Task<AddUserResponse> UpdateAdminAsync(AdminInfo adminInfo);
 
         Task<int> GetAdminsCount(string reportsToId = "");
         Task<SuccessResponse> UpdateAdminPasswordAsync(UpdatePasswordRequest req);
-        Task<SuccessResponse> UpdateSecretQuestionsAsync(AddUserSecretQuestionsRequest req);
-        Task<List<SecretQuestion>> GetUserSecretQuestionsAsync(string id);
     }
 }

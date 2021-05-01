@@ -14,32 +14,29 @@ namespace GarbItAPIService.Code
             services.AddTransient<AmbientContextMiddleware, AmbientContextMiddleware>();
             services.AddTransient<ExceptionHandler, ExceptionHandler>();
 
-            services.AddTransient<IDataService, AWSDynamoDBProvider.Services.AWSDataService>();
+            services.AddTransient<IDataService, SQLiteDBProvider.Services.SQLiteDataService>();
 
             services.AddTransient<ISuperAdminService, SuperAdminService.SuperAdminService>();
-            services.AddTransient<ISuperAdminProvider, AWSDynamoDBProvider.Providers.SuperAdminProvider>();
+            services.AddTransient<ISuperAdminProvider, SQLiteDBProvider.Providers.SuperAdminProvider>();
 
             services.AddTransient<IAdminService, AdminService.AdminService>();
-            services.AddTransient<IAdminProvider, AWSDynamoDBProvider.Providers.AdminProvider>();
+            services.AddTransient<IAdminProvider, SQLiteDBProvider.Providers.AdminProvider>();
 
             services.AddTransient<IEmployeeService, EmployeeService.EmployeeService>();
-            services.AddTransient<IEmployeeProvider, AWSDynamoDBProvider.Providers.EmployeeProvider>();
+            services.AddTransient<IEmployeeProvider, SQLiteDBProvider.Providers.EmployeeProvider>();
 
-            services.AddTransient<IPasswordProvider, AWSDynamoDBProvider.Providers.PasswordProvider>();
+            services.AddTransient<IPasswordProvider, SQLiteDBProvider.Providers.PasswordProvider>();
             
-            services.AddTransient<ISessionProvider, AWSDynamoDBProvider.Providers.SessionProvider>();
+            services.AddTransient<ISessionProvider, SQLiteDBProvider.Providers.SessionProvider>();
             services.AddTransient<ISessionService, SessionService.SessionService>();
 
             services.AddTransient<IRecordEntryService, RecordEntryService.RecordEntryService>();
-            services.AddTransient<IRecordEntryProvider, AWSDynamoDBProvider.Providers.RecordEntryProvider>();
+            services.AddTransient<IRecordEntryProvider, SQLiteDBProvider.Providers.RecordEntryProvider>();
 
             services.AddTransient<IClientService, ClientService.ClientService>();
-            services.AddTransient<IClientProvider, AWSDynamoDBProvider.Providers.ClientProvider>();
+            services.AddTransient<IClientProvider, SQLiteDBProvider.Providers.ClientProvider>();
 
-            services.AddTransient<IForgotPasswordService, ForgotPasswordService.ForgotPasswordService>();
-            services.AddTransient<IForgotPasswordProvider, AWSDynamoDBProvider.Providers.ForgotPasswordProvider>();
-
-            services.AddTransient<ICountProvider, AWSDynamoDBProvider.Providers.CountProvider>();
+            services.AddTransient<ICountProvider, SQLiteDBProvider.Providers.CountProvider>();
         }
     }
 }

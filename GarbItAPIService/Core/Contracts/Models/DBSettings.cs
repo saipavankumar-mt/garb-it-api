@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Contracts.Models
 {
-    public class AWSDynamoDBSettings
+    public class DBSettings
     {
         public TableNames TableNames { get; set; }
         public NextIdGeneratorValue NextIdGeneratorValue { get; set; }

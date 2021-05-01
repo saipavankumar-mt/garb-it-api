@@ -13,6 +13,7 @@ namespace ClientService
             var userInfo = AmbientContext.Current.UserInfo;
             var clientInfo = new ClientInfo()
             {
+                QRCodeId = Guid.NewGuid().ToString(),
                 Name = req.Name,
                 PhoneNumber = req.PhoneNumber,
                 Gender = req.Gender,
