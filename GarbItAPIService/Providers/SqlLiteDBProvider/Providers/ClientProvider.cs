@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SQLiteDBProvider.Translator;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,7 +49,9 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<ClientInfo> GetClientInfoAsync(string qrCodeId)
         {
-            return await _dataService.GetDataById<ClientInfo>(qrCodeId, _settings.TableNames.ClientTable);
+            var clientInfos = await _dataService.GetData<ClientInfo>(_settings.TableNames.ClientTable, "QRCodeId", qrCodeId);
+
+            return clientInfos?.FirstOrDefault();
         }
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)

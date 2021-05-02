@@ -97,7 +97,7 @@ namespace SqLiteDBProvider
                 sqlite_cmd = sqlite_conn.CreateCommand();
                 sqlite_cmd.CommandText = sqlCmd;
 
-                count = (int)sqlite_cmd.ExecuteScalar();
+                count = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
             }
             catch (Exception ex)
             {

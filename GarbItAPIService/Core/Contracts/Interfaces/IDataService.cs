@@ -13,7 +13,7 @@ namespace Contracts.Interfaces
         Task<(List<T>, string)> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "");
 
         Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null);
-        Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "");
+        Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "", string idKey ="");
 
         Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null);
 
@@ -28,6 +28,6 @@ namespace Contracts.Interfaces
         Task<bool> RemoveDataByIdAsync<T>(string id, string tableName);
         Task<int> GetDataCount(string tableName);
         Task<int> GetDataCount(string tableName, string filterKey, string filterValue);
-        Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null);
+        Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, string idKey = "");
     }
 }

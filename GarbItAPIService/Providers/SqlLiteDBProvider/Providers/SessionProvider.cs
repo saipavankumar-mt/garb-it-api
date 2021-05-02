@@ -54,29 +54,34 @@ namespace SQLiteDBProvider.Providers
         {
             if (loginRequest.Password.Equals(user.Password) && loginRequest.Role == user.Role)
             {
-                var sessionKey = Guid.NewGuid().ToString();
+                var userInfo = await GetUserInfo(loginRequest);
 
-                var req = new SessionInfo()
+                if(userInfo != null)
                 {
-                    Id = sessionKey,
-                    UserName = loginRequest.UserName,
-                    UserId = user.Id,
-                    Role = loginRequest.Role,
-                    UserFullName = user.Name,
-                    SessionCreatedOn = DateTime.Now.ToString(),
-                    Municipality = AmbientContext.Current?.UserInfo?.Municipality
-                };
+                    var sessionKey = Guid.NewGuid().ToString();
 
-                if (await _dataService.SaveDataSql(_settings.TableNames.SessionTable, req.ToInsertSqlCmdParams()))
-                {
-                    return new SessionResponse()
+                    var req = new SessionInfo()
                     {
-                        SessionKey = sessionKey,
-                        Id = user.Id,
-                        Name = user.Name,
-                        Role = user.Role,
-                        Municipality = AmbientContext.Current?.UserInfo?.Municipality 
+                        Id = sessionKey,
+                        UserName = userInfo.UserName,
+                        UserId = userInfo.Id,
+                        Role = userInfo.Role,
+                        UserFullName = userInfo.Name,
+                        SessionCreatedOn = DateTime.Now.ToString(),
+                        Municipality = userInfo.Municipality
                     };
+
+                    if (await _dataService.SaveDataSql(_settings.TableNames.SessionTable, req.ToInsertSqlCmdParams()))
+                    {
+                        return new SessionResponse()
+                        {
+                            SessionKey = sessionKey,
+                            Id = userInfo.Id,
+                            Name = userInfo.Name,
+                            Role = userInfo.Role,
+                            Municipality = userInfo.Municipality
+                        };
+                    }
                 }
             }
 
@@ -112,6 +117,35 @@ namespace SQLiteDBProvider.Providers
                         break;
                 }
             }
+        }
+
+        private async Task<UserInfo> GetUserInfo(LoginRequest request)
+        {
+            if (request != null)
+            {
+                switch (request.Role.ToString())
+                {
+                    case "SuperAdmin":
+                        {
+                            var userInfo = await _superAdminProvider.GetSuperAdminInfoByUserNameAsync(request.UserName);
+                            return userInfo;
+                        }
+                    case "Admin":
+                        {
+                            var userInfo = await _adminProvider.GetAdminInfoByUserNameAsync(request.UserName);
+                            return userInfo;
+                        }
+                    case "Employee":
+                        {
+                            var userInfo = await _employeeProvider.GetEmployeeInfoByUserNameAsync(request.UserName);
+                            return userInfo;
+                        }
+                    default:
+                        return null;
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace SQLiteDBProvider.Providers
                     Count = 1
                 };
 
-                await _dataService.SaveDataSql(_settings.TableNames.CountsInfoTable, countInfo.ToInsertSqlCmdParams());
+                await _dataService.SaveDataSql(_settings.TableNames.CountsInfoTable, dbCountInfo.ToInsertSqlCmdParams());
             }
             else
             {

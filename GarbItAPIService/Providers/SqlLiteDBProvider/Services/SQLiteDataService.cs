@@ -21,9 +21,39 @@ namespace SQLiteDBProvider.Services
             _client = new SQLiteClient();
         }
 
-        public Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+        public async Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
         {
-            throw new NotImplementedException();
+            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate, toDate);
+
+            if (searchRequests != null && searchRequests.Count > 0)
+            {
+                foreach (var item in searchRequests)
+                {
+                    sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                }
+            }
+
+            sqlCommand += string.Format("ORDER BY RecordId DESC");
+
+            var lst = new List<T>();
+
+            using (var client = new SQLiteClient())
+            {
+                var result = client.RunSelectSQL(sqlCommand);
+
+                if (result != null)
+                {
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
+                }
+            }
+
+            await Task.Delay(0);
+            return lst;
         }
 
         public async Task<List<T>> GetData<T>(string tableName)
@@ -34,11 +64,15 @@ namespace SQLiteDBProvider.Services
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 
@@ -55,12 +89,17 @@ namespace SQLiteDBProvider.Services
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
+
             }
 
             await Task.Delay(0);
@@ -75,11 +114,15 @@ namespace SQLiteDBProvider.Services
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 
@@ -95,11 +138,15 @@ namespace SQLiteDBProvider.Services
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 
@@ -125,15 +172,17 @@ namespace SQLiteDBProvider.Services
             return result;
         }
 
-        public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+        public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, string idKey = "")
         {
-            var sqlCommand = string.Format("SELECT COUNT(Id) from {0} where ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate, toDate);
+            idKey = string.IsNullOrEmpty(idKey) ? "Id" : idKey;
 
-            if(searchRequests!=null && searchRequests.Count>0)
+            var sqlCommand = string.Format("SELECT COUNT({0}) from {1} where ({2} BETWEEN '{3}' AND '{4}')", idKey, tableName, dateKey, fromDate, toDate);
+
+            if (searchRequests != null && searchRequests.Count > 0)
             {
                 foreach (var item in searchRequests)
                 {
-                    sqlCommand.Concat(string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                    sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                 }
             }
 
@@ -175,34 +224,43 @@ namespace SQLiteDBProvider.Services
 
         public async Task<(List<T>, string)> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "")
         {
-            var sqlCommand = string.Format("SELECT * from {0} ORDER BY Id LIMIT {1} OFFSET {2} ", tableName, limit, paginationToken);
+
+            var offset = string.IsNullOrEmpty(paginationToken) ? 0 : Convert.ToInt32(paginationToken);
+
+            var sqlCommand = string.Format("SELECT * from {0}", tableName);
 
             if (searchRequests != null && searchRequests.Count > 0)
             {
                 int i = 0;
                 foreach (var item in searchRequests)
                 {
-                    if(i==0)
+                    if (i == 0)
                     {
-                        sqlCommand.Concat(string.Format(" where ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        sqlCommand += (string.Format(" WHERE ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                     }
                     else
                     {
-                        sqlCommand.Concat(string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                     }
                 }
             }
+
+            sqlCommand += string.Format("ORDER BY Id DESC LIMIT {0} OFFSET {1}", limit, offset);
 
             var lst = new List<T>();
 
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 
@@ -212,7 +270,7 @@ namespace SQLiteDBProvider.Services
 
         public async Task<List<T>> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null)
         {
-            var sqlCommand = string.Format("SELECT * from {0} ORDER BY Id ", tableName);
+            var sqlCommand = string.Format("SELECT * from {0}", tableName);
 
             if (searchRequests != null && searchRequests.Count > 0)
             {
@@ -221,25 +279,31 @@ namespace SQLiteDBProvider.Services
                 {
                     if (i == 0)
                     {
-                        sqlCommand.Concat(string.Format(" where ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        sqlCommand += (string.Format(" WHERE ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                     }
                     else
                     {
-                        sqlCommand.Concat(string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                     }
                 }
             }
+
+            sqlCommand += string.Format("ORDER BY Id DESC");
 
             var lst = new List<T>();
 
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 
@@ -247,29 +311,38 @@ namespace SQLiteDBProvider.Services
             return lst;
         }
 
-        
-        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "")
+
+        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "", string idKey = "")
         {
-            var sqlCommand = string.Format("SELECT * from {0} ORDER BY Id LIMIT {1} OFFSET {2} where ({3} BETWEEN '{4}' AND '{5}')", tableName, limit, paginationToken, dateKey, fromDate, toDate);
+            var offset = string.IsNullOrEmpty(paginationToken) ? 0 : Convert.ToInt32(paginationToken);
+            idKey = string.IsNullOrEmpty(idKey) ? "Id" : idKey;
+
+            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate, toDate);
 
             if (searchRequests != null && searchRequests.Count > 0)
             {
                 foreach (var item in searchRequests)
                 {
-                    sqlCommand.Concat(string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                    sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                 }
             }
+
+            sqlCommand += string.Format("ORDER BY {0} DESC LIMIT {1} OFFSET {2}", idKey, limit, offset);
 
             var lst = new List<T>();
 
             using (var client = new SQLiteClient())
             {
                 var result = client.RunSelectSQL(sqlCommand);
-                var parser = result.GetRowParser<T>(typeof(T));
 
-                while (result.Read())
+                if (result != null)
                 {
-                    lst.Add(parser(result));
+                    var parser = result.GetRowParser<T>(typeof(T));
+
+                    while (result.Read())
+                    {
+                        lst.Add(parser(result));
+                    }
                 }
             }
 

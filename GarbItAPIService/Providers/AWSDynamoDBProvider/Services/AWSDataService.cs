@@ -173,7 +173,7 @@ namespace AWSDynamoDBProvider.Services
             return count;
         }
 
-        public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
+        public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, string idKey = "")
         {
             _dynamoDbOperationConfig.OverrideTableName = tableName;
 
@@ -268,7 +268,7 @@ namespace AWSDynamoDBProvider.Services
             return result;
         }
 
-        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken="")
+        public async Task<(List<T>, string)> QueryDataByPagination<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken="", string idKey = "")
         {
             string paginationResultToken = "";
             _dynamoDbOperationConfig.OverrideTableName = tableName;
