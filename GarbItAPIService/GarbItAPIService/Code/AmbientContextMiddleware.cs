@@ -69,6 +69,13 @@ namespace GarbItAPIService.Code
             {
                 throw new UnauthorizedAccessException();
             }
+
+            //Todo: database backups and deletes
+            bool isUnderMeintenance = false;
+            if(isUnderMeintenance)
+            {
+                throw new UnauthorizedAccessException("UnderMeintenance");
+            }
         }
     }
 }

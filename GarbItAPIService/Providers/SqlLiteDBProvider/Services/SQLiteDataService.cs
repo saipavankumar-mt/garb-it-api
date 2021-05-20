@@ -1,6 +1,7 @@
 ﻿using Contracts.Interfaces;
 using Contracts.Models;
 using Dapper;
+using Microsoft.Extensions.Options;
 using SqLiteDBProvider;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,18 @@ namespace SQLiteDBProvider.Services
 {
     public class SQLiteDataService : IDataService
     {
-        private SQLiteClient _client;
+        private DBSettings _settings;
+        private string databaseLocation;
 
-        public SQLiteDataService()
+        public SQLiteDataService(IOptions<DBSettings> options)
         {
-            _client = new SQLiteClient();
+            _settings = options.Value;
+            databaseLocation = _settings.DatabaseLocation.GarbitDatabase;
+        }
+
+        public void SetDataBaseSource(string databaseSource)
+        {
+            databaseLocation = databaseSource;
         }
 
         public async Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
@@ -37,7 +45,7 @@ namespace SQLiteDBProvider.Services
 
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -61,7 +69,7 @@ namespace SQLiteDBProvider.Services
             var sqlCommand = string.Format("Select * from {0}", tableName);
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -86,7 +94,7 @@ namespace SQLiteDBProvider.Services
 
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -111,7 +119,7 @@ namespace SQLiteDBProvider.Services
             var sqlCommand = string.Format("Select * from {0} where Id = '{1}'", tableName, id);
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -135,7 +143,7 @@ namespace SQLiteDBProvider.Services
             var sqlCommand = string.Format("Select * from {0} where UserName = '{1}'", tableName, userName);
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -157,19 +165,25 @@ namespace SQLiteDBProvider.Services
         public async Task<int> GetDataCount(string tableName)
         {
             var sqlCommand = string.Format("SELECT COUNT(Id) from {0}", tableName);
-            var result = _client.RunCountSQL(sqlCommand);
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunCountSQL(sqlCommand);
+                await Task.Delay(0);
+                return result;
+            }
 
-            await Task.Delay(0);
-            return result;
         }
 
         public async Task<int> GetDataCount(string tableName, string filterKey, string filterValue)
         {
             var sqlCommand = string.Format("SELECT COUNT(Id) from {0} where {1} = '{2}'", tableName, filterKey, filterValue);
-            var result = _client.RunCountSQL(sqlCommand);
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunCountSQL(sqlCommand);
 
-            await Task.Delay(0);
-            return result;
+                await Task.Delay(0);
+                return result;
+            }
         }
 
         public async Task<int> GetDataCountByDateRange(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null, string idKey = "")
@@ -185,40 +199,51 @@ namespace SQLiteDBProvider.Services
                     sqlCommand += (string.Format(" AND ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
                 }
             }
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunCountSQL(sqlCommand);
+                await Task.Delay(0);
+                return result;
+            }
 
-            var result = _client.RunCountSQL(sqlCommand);
-
-            await Task.Delay(0);
-            return result;
         }
 
         public async Task<bool> RemoveDataByIdAsync<T>(string id, string tableName)
         {
             var sqlCommand = string.Format("DELETE from {0} where Id = '{1}'", tableName, id);
-            var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
 
-            await Task.Delay(0);
-            return result;
+                await Task.Delay(0);
+                return result; 
+            }
         }
 
 
         public async Task<bool> SaveDataSql(string tableName, string cmdParams)
         {
             var sqlCommand = string.Format("INSERT INTO {0}{1}", tableName, cmdParams);
-            var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
 
-            await Task.Delay(0);
-            return result;
+                await Task.Delay(0);
+                return result; 
+            }
         }
 
 
         public async Task<bool> UpdateDataSql(string tableName, string id, string cmdParams)
         {
             var sqlCommand = string.Format("UPDATE {0} SET {1} WHERE Id={2}", tableName, cmdParams, id);
-            var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
+            using (SQLiteClient _client = new SQLiteClient(databaseLocation))
+            {
+                var result = _client.RunInsertOrUpdateOrDeleteSQL(sqlCommand);
 
-            await Task.Delay(0);
-            return result;
+                await Task.Delay(0);
+                return result; 
+            }
         }
 
 
@@ -237,6 +262,7 @@ namespace SQLiteDBProvider.Services
                     if (i == 0)
                     {
                         sqlCommand += (string.Format(" WHERE ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        i++;
                     }
                     else
                     {
@@ -249,7 +275,7 @@ namespace SQLiteDBProvider.Services
 
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -280,6 +306,7 @@ namespace SQLiteDBProvider.Services
                     if (i == 0)
                     {
                         sqlCommand += (string.Format(" WHERE ( {0} = '{1}' ) ", item.SearchByKey, item.SearchByValue));
+                        i++;
                     }
                     else
                     {
@@ -292,7 +319,7 @@ namespace SQLiteDBProvider.Services
 
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 
@@ -331,7 +358,7 @@ namespace SQLiteDBProvider.Services
 
             var lst = new List<T>();
 
-            using (var client = new SQLiteClient())
+            using (var client = new SQLiteClient(databaseLocation))
             {
                 var result = client.RunSelectSQL(sqlCommand);
 

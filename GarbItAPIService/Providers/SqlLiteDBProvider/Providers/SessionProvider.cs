@@ -27,6 +27,7 @@ namespace SQLiteDBProvider.Providers
             _superAdminProvider = superAdminProvider;
             _employeeProvider = employeeProvider;
             _settings = options.Value;
+            _dataService.SetDataBaseSource(_settings.DatabaseLocation.SessionDatabase);
         }
 
         public async Task<SessionInfo> GetSessionInfoAsync(string sessionKey)

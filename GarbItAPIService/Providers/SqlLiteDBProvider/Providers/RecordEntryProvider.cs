@@ -21,6 +21,7 @@ namespace SQLiteDBProvider.Providers
             _dataService = dataService;
             _settings = options.Value;
             _countProvider = countProvider;
+            _dataService.SetDataBaseSource(_settings.DatabaseLocation.SessionDatabase);
         }
 
 

@@ -470,5 +470,10 @@ namespace AWSDynamoDBProvider.Services
         {
             throw new NotImplementedException();
         }
+
+        public void SetDataBaseSource(string databaseSource)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
