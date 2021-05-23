@@ -8,6 +8,7 @@ namespace Contracts.Interfaces
 {
     public interface IDataService
     {
+        void SetDataBaseSource(string databaseSource);
         Task<List<T>> GetData<T>(string tableName);
         Task<List<T>> GetData<T>(string tableName, string relationshipKey, string relationshipId);
         Task<(List<T>, string)> SearchData<T>(string tableName, List<SearchRequest> searchRequests = null, int limit = 200, string paginationToken = "");

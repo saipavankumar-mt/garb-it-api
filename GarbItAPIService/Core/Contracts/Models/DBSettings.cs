@@ -6,6 +6,7 @@ namespace Contracts.Models
 {
     public class DBSettings
     {
+        public DatabaseLocation DatabaseLocation { get; set; }
         public TableNames TableNames { get; set; }
         public NextIdGeneratorValue NextIdGeneratorValue { get; set; }
         public UserIdPrefix UserIdPrefix { get; set; }
@@ -23,6 +24,13 @@ namespace Contracts.Models
         public string RecordEntryTable { get; set; }
         public string SecretQuestionsTable { get; set; }
         public string CountsInfoTable { get; set; }
+    }
+
+    public class DatabaseLocation
+    {
+        public string GarbitDatabase { get; set; }
+        public string SessionDatabase { get; set; }
+        public string RecordEntryDatabase { get; set; }
     }
 
     public class NextIdGeneratorValue

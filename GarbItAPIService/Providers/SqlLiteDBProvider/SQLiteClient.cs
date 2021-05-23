@@ -12,9 +12,10 @@ namespace SqLiteDBProvider
         private ReaderWriterLockSlim _readerWriterLock = new ReaderWriterLockSlim();
         private SQLiteConnection sqlite_conn;
 
-        public SQLiteClient()
+        public SQLiteClient(string databaseLocation)
         {
-            sqlite_conn = new SQLiteConnection("Data Source=E:\\garb-it.db; Version = 3; New = True; Compress = True; ");
+            //databaseLocation = "C:\\garb-it.db";
+            sqlite_conn = new SQLiteConnection($"Data Source={databaseLocation}; Version = 3; New = True; Compress = True; ");
         }
 
 
