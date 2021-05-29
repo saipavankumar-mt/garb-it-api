@@ -62,7 +62,7 @@ namespace EmployeeService
         {
             employeeInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
             employeeInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
-            employeeInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            employeeInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             return await _employeeProvider.UpdateEmployeeAsync(employeeInfo);
         }

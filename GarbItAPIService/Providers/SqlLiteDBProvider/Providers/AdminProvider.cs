@@ -35,7 +35,15 @@ namespace SQLiteDBProvider.Providers
             {
                 response = await _dataService.GetData<AdminInfo>(_settings.TableNames.AdminTable, "ReportsToId", reportsToId);
             }
-
+            if (response != null)
+            {
+                foreach (var item in response)
+                {
+                    item.DateOfBirth = item?.DateOfBirth?.ConvertDate();
+                    item.CreatedDateTime = item?.CreatedDateTime?.ConvertDate();
+                    item.UpdatedDateTime = item?.UpdatedDateTime?.ConvertDate();
+                } 
+            }
             return response;
         }
 
@@ -84,7 +92,15 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<AdminInfo> GetAdminInfoAsync(string id)
         {
-            return await _dataService.GetDataById<AdminInfo>(id, _settings.TableNames.AdminTable);
+            var response = await _dataService.GetDataById<AdminInfo>(id, _settings.TableNames.AdminTable);
+
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
 
         public async Task<RemoveUserResponse> RemoveAdminInfoByIdAsync(string id)
@@ -127,7 +143,7 @@ namespace SQLiteDBProvider.Providers
 
             adminInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
             adminInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
-            adminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            adminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             var passwordInfo = await _passwordProvider.GetUserPassword(adminInfo.UserName);
             passwordInfo.Password = req.NewPassword;
@@ -139,7 +155,14 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<AdminInfo> GetAdminInfoByUserNameAsync(string userName)
         {
-            return await _dataService.GetDataByUserName<AdminInfo>(userName, _settings.TableNames.AdminTable);
+            var response = await _dataService.GetDataByUserName<AdminInfo>(userName, _settings.TableNames.AdminTable);
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
     }
 }

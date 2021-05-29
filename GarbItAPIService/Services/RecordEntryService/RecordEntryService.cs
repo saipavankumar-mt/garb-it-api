@@ -45,7 +45,7 @@ namespace RecordEntryService
                 EmployeeName = AmbientContext.Current.UserInfo.Name,
                 Municipality = clientInfo.Municipality,
                 Location = clientInfo.Location,
-                ScannedDateTime = DateTime.Now.ToString()
+                ScannedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
             return await _recordEntryProvider.AddRecordEntryAsync(recordInfo);

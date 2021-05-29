@@ -32,10 +32,10 @@ namespace AdminService
                 ReportsToName = userInfo.Name,
                 CreatedById = userInfo.Id,
                 CreatedByName = userInfo.Name,
-                CreatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
+                CreatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 UpdatedById = userInfo.Id,
                 UpdatedByName = userInfo.Name,
-                UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm"),
+                UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             };
 
             return adminInfo;
