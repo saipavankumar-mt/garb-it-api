@@ -74,7 +74,7 @@ namespace ClientService
 
         public async Task<AddClientResponse> UpdateClientAsync(ClientInfo clientInfo)
         {
-            clientInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            clientInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             clientInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
             clientInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
 

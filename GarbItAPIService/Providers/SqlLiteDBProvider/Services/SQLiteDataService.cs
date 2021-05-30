@@ -31,7 +31,7 @@ namespace SQLiteDBProvider.Services
 
         public async Task<List<T>> ExportData<T>(string tableName, string dateKey, DateTime fromDate, DateTime toDate, List<SearchRequest> searchRequests = null)
         {
-            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate, toDate);
+            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate.ToString("yyyy-MM-dd HH:mm:ss"), toDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             if (searchRequests != null && searchRequests.Count > 0)
             {
@@ -190,7 +190,7 @@ namespace SQLiteDBProvider.Services
         {
             idKey = string.IsNullOrEmpty(idKey) ? "Id" : idKey;
 
-            var sqlCommand = string.Format("SELECT COUNT({0}) from {1} where ({2} BETWEEN '{3}' AND '{4}')", idKey, tableName, dateKey, fromDate, toDate);
+            var sqlCommand = string.Format("SELECT COUNT({0}) from {1} where ({2} BETWEEN '{3}' AND '{4}')", idKey, tableName, dateKey, fromDate.ToString("yyyy-MM-dd HH:mm:ss"), toDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             if (searchRequests != null && searchRequests.Count > 0)
             {
@@ -344,7 +344,7 @@ namespace SQLiteDBProvider.Services
             var offset = string.IsNullOrEmpty(paginationToken) ? 0 : Convert.ToInt32(paginationToken);
             idKey = string.IsNullOrEmpty(idKey) ? "Id" : idKey;
 
-            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate, toDate);
+            var sqlCommand = string.Format("SELECT * from {0} WHERE ({1} BETWEEN '{2}' AND '{3}')", tableName, dateKey, fromDate.ToString("yyyy-MM-dd HH:mm:ss"), toDate.ToString("yyyy-MM-dd HH:mm:ss"));
 
             if (searchRequests != null && searchRequests.Count > 0)
             {

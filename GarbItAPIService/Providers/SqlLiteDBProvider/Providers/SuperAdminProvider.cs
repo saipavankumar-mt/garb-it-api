@@ -25,12 +25,26 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<SuperAdminInfo> GetSuperAdminInfoAsync(string id)
         {
-            return await _dataService.GetDataById<SuperAdminInfo>(id, _settings.TableNames.SuperAdminTable);
+            var response = await _dataService.GetDataById<SuperAdminInfo>(id, _settings.TableNames.SuperAdminTable);
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
 
         public async Task<SuperAdminInfo> GetSuperAdminInfoByUserNameAsync(string userName)
         {
-            return await _dataService.GetDataByUserName<SuperAdminInfo>(userName, _settings.TableNames.SuperAdminTable);
+            var response = await _dataService.GetDataByUserName<SuperAdminInfo>(userName, _settings.TableNames.SuperAdminTable);
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
 
         public async Task<AddUserResponse> AddSuperAdmin(SuperAdminInfo superAdminInfo)
@@ -83,7 +97,7 @@ namespace SQLiteDBProvider.Providers
 
             userInfo.UpdatedById = AmbientContext.Current.UserInfo.Name;
             userInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
-            userInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            userInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             var passwordInfo = await _passwordProvider.GetUserPassword(userInfo.UserName);
             passwordInfo.Password = req.NewPassword;

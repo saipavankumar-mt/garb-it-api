@@ -35,7 +35,10 @@ namespace SQLiteDBProvider.Providers
             var sessionInfo = await _dataService.GetDataById<SessionInfo>(sessionKey, _settings.TableNames.SessionTable);
 
             await SaveUserInfoToContext(sessionInfo);
-
+            if (sessionInfo!=null)
+            {
+                sessionInfo.SessionCreatedOn = sessionInfo.SessionCreatedOn?.ConvertDate();
+            }
             return sessionInfo;
         }
 
@@ -68,7 +71,7 @@ namespace SQLiteDBProvider.Providers
                         UserId = userInfo.Id,
                         Role = userInfo.Role,
                         UserFullName = userInfo.Name,
-                        SessionCreatedOn = DateTime.Now.ToString(),
+                        SessionCreatedOn = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                         Municipality = userInfo.Municipality
                     };
 

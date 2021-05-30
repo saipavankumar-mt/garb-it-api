@@ -21,7 +21,7 @@ namespace SQLiteDBProvider.Providers
             _dataService = dataService;
             _settings = options.Value;
             _countProvider = countProvider;
-            _dataService.SetDataBaseSource(_settings.DatabaseLocation.SessionDatabase);
+            _dataService.SetDataBaseSource(_settings.DatabaseLocation.RecordEntryDatabase);
         }
 
 
@@ -75,7 +75,13 @@ namespace SQLiteDBProvider.Providers
 
             var result = await _dataService.QueryDataByPagination<RecordEntryInfo>(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests, limit, paginationToken, "RecordId");
 
-
+            if (result.Item1 != null)
+            {
+                foreach (var item in result.Item1)
+                {
+                    item.ScannedDateTime = item?.ScannedDateTime?.ConvertDate();
+                }
+            }
             return new SearchedRecordsResponse()
             {
                 RecordEntries = result.Item1,
@@ -86,7 +92,15 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<List<RecordEntryInfo>> ExportRecordsAsync(List<SearchRequest> searchRequests, DateTime fromDateTime, DateTime toDateTime)
         {
-            return await _dataService.ExportData<RecordEntryInfo>(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
+            var response = await _dataService.ExportData<RecordEntryInfo>(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, searchRequests);
+            if (response != null)
+            {
+                foreach (var item in response)
+                {
+                    item.ScannedDateTime = item?.ScannedDateTime?.ConvertDate();
+                }
+            }
+            return response;
         }
 
         public async Task<int> GetEmployeeCollectedCountAsync(DateTime fromDateTime, DateTime toDateTime, string employeeName)

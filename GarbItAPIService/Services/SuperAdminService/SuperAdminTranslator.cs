@@ -31,8 +31,8 @@ namespace SuperAdminService
                 CreatedByName = "Installer",
                 UpdatedById = "Installer",
                 UpdatedByName = "Installer",
-                CreatedDateTime = DateTime.Now.ToString(),
-                UpdatedDateTime = DateTime.Now.ToString()
+                CreatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
             return superAdminInfo;
