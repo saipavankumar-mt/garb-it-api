@@ -34,10 +34,6 @@ namespace SqLiteDBProvider
 
                 sqlite_datareader = sqlite_cmd.ExecuteReader();
             }
-            catch (Exception ex)
-            {
-
-            }
             finally
             {                
                 _readerWriterLock.ExitReadLock();
@@ -68,10 +64,6 @@ namespace SqLiteDBProvider
                     result = sqlite_cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
             finally
             {
                 sqlite_conn.Close();
@@ -99,10 +91,6 @@ namespace SqLiteDBProvider
                 sqlite_cmd.CommandText = sqlCmd;
 
                 count = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
-            }
-            catch (Exception ex)
-            {
-
             }
             finally
             {
