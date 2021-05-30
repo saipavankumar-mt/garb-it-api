@@ -26,7 +26,7 @@ namespace AdminService
         {
             adminInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
             adminInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
-            adminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            adminInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             return await _adminProvider.UpdateAdminAsync(adminInfo);
         }

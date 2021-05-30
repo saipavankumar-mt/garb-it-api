@@ -35,7 +35,15 @@ namespace SQLiteDBProvider.Providers
             {
                 response = await _dataService.GetData<EmployeeInfo>(_settings.TableNames.EmployeeTable, "ReportsToId", reportsToId);
             }
-
+            if (response != null)
+            {
+                foreach (var item in response)
+                {
+                    item.DateOfBirth = item?.DateOfBirth?.ConvertDate();
+                    item.CreatedDateTime = item?.CreatedDateTime?.ConvertDate();
+                    item.UpdatedDateTime = item?.UpdatedDateTime?.ConvertDate();
+                }
+            }
             return response;
 
         }
@@ -57,13 +65,28 @@ namespace SQLiteDBProvider.Providers
             var response = new List<EmployeeInfo>();
 
             response = await _dataService.SearchData<EmployeeInfo>(_settings.TableNames.EmployeeTable, searchRequests);
-
+            if (response != null)
+            {
+                foreach (var item in response)
+                {
+                    item.DateOfBirth = item?.DateOfBirth?.ConvertDate();
+                    item.CreatedDateTime = item?.CreatedDateTime?.ConvertDate();
+                    item.UpdatedDateTime = item?.UpdatedDateTime?.ConvertDate();
+                }
+            }
             return response;
         }
 
         public async Task<EmployeeInfo> GetEmployeeInfoAsync(string id)
         {
-            return await _dataService.GetDataById<EmployeeInfo>(id, _settings.TableNames.EmployeeTable);
+            var response = await _dataService.GetDataById<EmployeeInfo>(id, _settings.TableNames.EmployeeTable);
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
 
         
@@ -126,7 +149,7 @@ namespace SQLiteDBProvider.Providers
 
             userInfo.UpdatedById = AmbientContext.Current.UserInfo.Id;
             userInfo.UpdatedByName = AmbientContext.Current.UserInfo.Name;
-            userInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm");
+            userInfo.UpdatedDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             var passwordInfo = await _passwordProvider.GetUserPassword(userInfo.UserName);
             passwordInfo.Password = req.NewPassword;
@@ -150,7 +173,14 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<EmployeeInfo> GetEmployeeInfoByUserNameAsync(string userName)
         {
-            return await _dataService.GetDataByUserName<EmployeeInfo>(userName, _settings.TableNames.EmployeeTable);
+            var response = await _dataService.GetDataByUserName<EmployeeInfo>(userName, _settings.TableNames.EmployeeTable);
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
     }
 }

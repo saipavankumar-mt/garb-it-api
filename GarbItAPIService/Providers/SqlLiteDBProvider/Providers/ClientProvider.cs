@@ -27,7 +27,15 @@ namespace SQLiteDBProvider.Providers
         public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
         {
             var response = await _dataService.SearchData<ClientInfo>(_settings.TableNames.ClientTable, searchRequests, limit, paginationToken);
-
+            if (response.Item1 != null)
+            {
+                foreach (var item in response.Item1)
+                {
+                    item.DateOfBirth = item?.DateOfBirth?.ConvertDate();
+                    item.CreatedDateTime = item?.CreatedDateTime?.ConvertDate();
+                    item.UpdatedDateTime = item?.UpdatedDateTime?.ConvertDate();
+                }
+            }
             return new SearchClientsResponse()
             {
                 ClientInfos = response.Item1,
@@ -51,7 +59,15 @@ namespace SQLiteDBProvider.Providers
         {
             var clientInfos = await _dataService.GetData<ClientInfo>(_settings.TableNames.ClientTable, "QRCodeId", qrCodeId);
 
-            return clientInfos?.FirstOrDefault();
+            var response = clientInfos?.FirstOrDefault();
+
+            if (response != null)
+            {
+                response.DateOfBirth = response?.DateOfBirth?.ConvertDate();
+                response.CreatedDateTime = response?.CreatedDateTime?.ConvertDate();
+                response.UpdatedDateTime = response?.UpdatedDateTime?.ConvertDate();
+            }
+            return response;
         }
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
