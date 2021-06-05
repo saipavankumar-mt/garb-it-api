@@ -35,8 +35,6 @@ namespace GarbItAPIService.Code
 
             services.AddTransient<IClientService, ClientService.ClientService>();
             services.AddTransient<IClientProvider, SQLiteDBProvider.Providers.ClientProvider>();
-
-            services.AddTransient<ICountProvider, SQLiteDBProvider.Providers.CountProvider>();
         }
     }
 }

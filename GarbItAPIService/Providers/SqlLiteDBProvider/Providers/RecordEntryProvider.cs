@@ -14,34 +14,18 @@ namespace SQLiteDBProvider.Providers
     {
         private IDataService _dataService;
         private DBSettings _settings;
-        private ICountProvider _countProvider;
 
-        public RecordEntryProvider(IDataService dataService, IOptions<DBSettings> options, ICountProvider countProvider)
+        public RecordEntryProvider(IDataService dataService, IOptions<DBSettings> options)
         {
             _dataService = dataService;
             _settings = options.Value;
-            _countProvider = countProvider;
             _dataService.SetDataBaseSource(_settings.DatabaseLocation.RecordEntryDatabase);
         }
 
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
-            if (await _dataService.SaveDataSql(_settings.TableNames.RecordEntryTable, recordInfo.ToInsertSqlCmdParams()))
-            { 
-                //Increment record counter
-                string counterId = String.Format("{0}-{1}-Records", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
-
-                await _countProvider.IncrementCountAsync(counterId);
-
-                //Increment Employee Scan counter
-                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", DateTime.Today.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, AmbientContext.Current.UserInfo.Name);
-
-                await _countProvider.IncrementCountAsync(employeeCounterId);
-
-                return new AddRecordResponse();
-            }
-
+            await _dataService.SaveDataSql(_settings.TableNames.RecordEntryTable, recordInfo.ToInsertSqlCmdParams());
             return new AddRecordResponse();
         }
 
@@ -52,14 +36,9 @@ namespace SQLiteDBProvider.Providers
 
             while (startDate <= toDateTime.Date)
             {
-                string counterId = String.Format("{0}-{1}-Records", startDate.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality);
+                var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality } }, "RecordId");
 
-                var countInfo = await _countProvider.GetCountInfoAsync(counterId);
-                
-                if(countInfo!=null)
-                {
-                    finalCount += countInfo.Count;
-                }
+                finalCount += count;
 
                 startDate = startDate.Date.AddDays(1);
             }
@@ -110,14 +89,9 @@ namespace SQLiteDBProvider.Providers
 
             while (startDate <= toDateTime.Date)
             {
-                string employeeCounterId = String.Format("{0}-{1}-{2}-Scans", startDate.ToString("yyyy-MM-dd"), AmbientContext.Current.UserInfo.Municipality, employeeName);
+                var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "EmployeeName", SearchByValue = employeeName } }, "RecordId");
 
-                var countInfo = await _countProvider.GetCountInfoAsync(employeeCounterId);
-
-                if (countInfo != null)
-                {
-                    finalCount += countInfo.Count;
-                }
+                finalCount += count;
 
                 startDate = startDate.Date.AddDays(1);
             }

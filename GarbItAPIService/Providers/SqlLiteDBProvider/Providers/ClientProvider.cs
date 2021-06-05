@@ -15,13 +15,11 @@ namespace SQLiteDBProvider.Providers
     {
         private IDataService _dataService;
         private DBSettings _settings;
-        private ICountProvider _countProvider;
 
-        public ClientProvider(IDataService dataService, IOptions<DBSettings> options, ICountProvider countProvider)
+        public ClientProvider(IDataService dataService, IOptions<DBSettings> options)
         {
             _dataService = dataService;
             _settings = options.Value;
-            _countProvider = countProvider;
         }
 
         public async Task<SearchClientsResponse> SearchClientAsync(List<SearchRequest> searchRequests, int limit = 200, string paginationToken = "")
@@ -40,19 +38,13 @@ namespace SQLiteDBProvider.Providers
             {
                 ClientInfos = response.Item1,
                 PaginationToken = response.Item2
-            }; 
+            };
         }
 
-        public async Task<int> SearchClientCountAsync(SearchRequest searchRequest=null)
+        public async Task<int> SearchClientCountAsync(SearchRequest searchRequest = null)
         {
-            string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
-            var countInfo = await _countProvider.GetCountInfoAsync(counterId);
-            if(countInfo!=null)
-            {
-                return countInfo.Count;
-            }
-
-            return 0;
+            var response = await _dataService.GetDataCount(_settings.TableNames.ClientTable, "Municipality", AmbientContext.Current.UserInfo.Municipality);
+            return response;
         }
 
         public async Task<ClientInfo> GetClientInfoAsync(string qrCodeId)
@@ -72,19 +64,13 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<AddClientResponse> RegisterClientAsync(ClientInfo clientInfo)
         {
-            if (await _dataService.SaveDataSql(_settings.TableNames.ClientTable, clientInfo.ToInsertSqlCmdParams()))
+            await _dataService.SaveDataSql(_settings.TableNames.ClientTable, clientInfo.ToInsertSqlCmdParams());
+            return new AddClientResponse()
             {
-                string counterId = String.Format("{0}-Clients", AmbientContext.Current.UserInfo.Municipality);
-                await _countProvider.IncrementCountAsync(counterId, false);
+                Name = clientInfo.Name,
+                QRCodeId = clientInfo.QRCodeId
+            };
 
-                return new AddClientResponse()
-                {
-                    Name = clientInfo.Name,
-                    QRCodeId = clientInfo.QRCodeId
-                };
-            }
-
-            return new AddClientResponse();
         }
 
         public async Task<AddClientResponse> UpdateClientAsync(ClientInfo updateInfo)
@@ -102,6 +88,6 @@ namespace SQLiteDBProvider.Providers
             return new AddClientResponse();
         }
 
-        
+
     }
 }
