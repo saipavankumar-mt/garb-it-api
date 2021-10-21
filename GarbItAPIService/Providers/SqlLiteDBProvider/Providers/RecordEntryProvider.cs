@@ -25,7 +25,11 @@ namespace SQLiteDBProvider.Providers
 
         public async Task<AddRecordResponse> AddRecordEntryAsync(RecordEntryInfo recordInfo)
         {
-            await _dataService.SaveDataSql(_settings.TableNames.RecordEntryTable, recordInfo.ToInsertSqlCmdParams());
+            bool result = await _dataService.SaveDataSql(_settings.TableNames.RecordEntryTable, recordInfo.ToInsertSqlCmdParams());
+            if (result)
+            {
+                return new AddRecordResponse() { RecordId = "1" };
+            }
             return new AddRecordResponse();
         }
 
@@ -33,15 +37,11 @@ namespace SQLiteDBProvider.Providers
         {
             int finalCount = 0;
             DateTime startDate = fromDateTime.Date;
+            
+            var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality } }, "RecordId");
 
-            while (startDate <= toDateTime.Date)
-            {
-                var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "Municipality", SearchByValue = AmbientContext.Current.UserInfo.Municipality } }, "RecordId");
-
-                finalCount += count;
-
-                startDate = startDate.Date.AddDays(1);
-            }
+            finalCount += count;
+            
 
             return finalCount;
         }
@@ -87,14 +87,9 @@ namespace SQLiteDBProvider.Providers
             int finalCount = 0;
             DateTime startDate = fromDateTime.Date;
 
-            while (startDate <= toDateTime.Date)
-            {
-                var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "EmployeeName", SearchByValue = employeeName } }, "RecordId");
+            var count = await _dataService.GetDataCountByDateRange(_settings.TableNames.RecordEntryTable, "ScannedDateTime", fromDateTime, toDateTime, new List<SearchRequest>() { new SearchRequest() { SearchByKey = "EmployeeName", SearchByValue = employeeName } }, "RecordId");
 
-                finalCount += count;
-
-                startDate = startDate.Date.AddDays(1);
-            }
+            finalCount += count;
 
             return finalCount;
         }

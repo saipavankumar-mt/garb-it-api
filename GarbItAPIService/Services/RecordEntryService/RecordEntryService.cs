@@ -104,7 +104,7 @@ namespace RecordEntryService
                 response.Add(new RecordScannedDayCountResponse()
                 {
                     Date = startDate.ToString("yyyy-MM-dd"),
-                    Count = await _recordEntryProvider.GetCollectedCountAsync(startDate, startDate)
+                    Count = await _recordEntryProvider.GetCollectedCountAsync(startDate, startDate.AddDays(1).AddSeconds(-1))
                 });
 
                 startDate = startDate.AddDays(1);
